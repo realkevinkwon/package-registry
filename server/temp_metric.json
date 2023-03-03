@@ -1,0 +1,37 @@
+{
+  "https://github.com/cloudinary/cloudinary_npm": {
+    "RampUp": 0.26,
+    "ResponsiveMaintainer": 0.5,
+    "BusFactor": 0.3,
+    "Correctness": 0.5,
+    "License": 0
+  },
+  "https://www.npmjs.com/package/express": {
+    "RampUp": 0.3,
+    "ResponsiveMaintainer": 0.65,
+    "BusFactor": 0.6,
+    "Correctness": 0.8,
+    "License": 1
+  },
+  "https://github.com/nullivex/nodist": {
+    "RampUp": 0.26,
+    "ResponsiveMaintainer": 0.5,
+    "BusFactor": 0.3,
+    "Correctness": 0.5,
+    "License": 1
+  },
+  "https://github.com/lodash/lodash": {
+    "RampUp": 0.26,
+    "ResponsiveMaintainer": 0.5,
+    "BusFactor": 0.3,
+    "Correctness": 0.5,
+    "License": 0
+  },
+  "https://www.npmjs.com/package/browserify": {
+    "RampUp": 0.26,
+    "ResponsiveMaintainer": 0.5,
+    "BusFactor": 0.3,
+    "Correctness": 0.5,
+    "License": 1
+  }
+}
