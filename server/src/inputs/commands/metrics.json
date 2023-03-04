@@ -2,22 +2,31 @@
     "https://github.com/cloudinary/cloudinary_npm": {
         "RampUp": 0.73,
         "License": 0,
-        "Correctness": 0.66,
+        "Correctness": 0.67,
         "ResponsiveMaintainer": 0.68,
-        "BusFactor": 0.62
+        "BusFactor": 0.62,
+        "PR_Fraction": 0.63
     },
     "https://www.npmjs.com/package/express": {
-        "RampUp": 1.0,
         "License": 1,
-        "Correctness": 0.94,
-        "ResponsiveMaintainer": 0.75,
-        "BusFactor": 0.58
+        "Correctness": 0.95,
+        "ResponsiveMaintainer": 0.85,
+        "BusFactor": 0.58,
+        "PR_Fraction": 0.83
     },
     "https://github.com/nullivex/nodist": {
-        "RampUp": 0.83,
         "License": 1,
         "Correctness": 0,
-        "ResponsiveMaintainer": 0.35,
-        "BusFactor": 0.72
+        "ResponsiveMaintainer": 0.34,
+        "BusFactor": 0.72,
+        "PR_Fraction": 0.8
+    },
+    "https://github.com/jonschlinkert/even": {
+        "RampUp": 0.52,
+        "License": 1,
+        "Correctness": 1.0,
+        "ResponsiveMaintainer": 0.5,
+        "BusFactor": 0.88,
+        "PR_Fraction": 0.0
     }
 }

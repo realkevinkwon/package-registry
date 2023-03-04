@@ -1,0 +1,39 @@
+
+{"header" : {
+  "cloc_url"           : "github.com/AlDanial/cloc",
+  "cloc_version"       : "1.90",
+  "elapsed_seconds"    : 0.0322608947753906,
+  "n_files"            : 5,
+  "n_lines"            : 179,
+  "files_per_second"   : 154.986401797328,
+  "lines_per_second"   : 5548.51318434433},
+"Repo-Analysis/package.json" :{
+  "blank": 0,
+  "comment": 0,
+  "code": 49,
+  "language": "JSON"},
+"Repo-Analysis/README.md" :{
+  "blank": 17,
+  "comment": 0,
+  "code": 29,
+  "language": "Markdown"},
+"Repo-Analysis/.verb.md" :{
+  "blank": 14,
+  "comment": 0,
+  "code": 24,
+  "language": "Markdown"},
+"Repo-Analysis/test.js" :{
+  "blank": 6,
+  "comment": 6,
+  "code": 17,
+  "language": "JavaScript"},
+"Repo-Analysis/index.js" :{
+  "blank": 3,
+  "comment": 6,
+  "code": 8,
+  "language": "JavaScript"},
+"SUM": {
+  "blank": 40,
+  "comment": 12,
+  "code": 127,
+  "nFiles": 5} }
