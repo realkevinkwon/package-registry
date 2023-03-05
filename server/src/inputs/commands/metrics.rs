@@ -11,6 +11,7 @@ pub struct Metrics {
     pub bus_factor:f64,
     pub responsiveness:f64,
     pub license:f64,
+    pub pr_fraction:f64,
     pub total:f64,
 }
 
@@ -23,6 +24,7 @@ impl Metrics {
             bus_factor: -1.0,
             responsiveness: -1.0,
             license: -1.0,
+            pr_fraction: -1.0,
             total: -1.0,
         }
     }
@@ -208,6 +210,41 @@ impl Metrics {
 
 
     /* 
+        Function: get_pr_fraction
+        Arguments: module_url - the name of the module the metric is graded for
+        Return: Result<(), Error>
+
+        Description: This function runs a script and sends the pull request fraction metric to a 
+        json file based on the fraction of code in the repository brought by pulled requests
+
+        Example: 
+            let metrics = Metrics::new();
+            metrics.get_pr_fraction();
+    */
+
+    pub fn get_pr_fraction(&mut self,  _module_url: &str) -> Result<(), Error> {
+        let mut contents = String::new();
+        let mut file = fs::File::open(ABSOLUTE_JSON_PATH).expect("Unable to open file");
+        file.read_to_string(&mut contents).expect("Unable to read file");
+
+        let json: serde_json::Value = serde_json::from_str(&contents)?;
+
+        for (key, value) in json.as_object().unwrap().iter() {
+            if key == _module_url {
+                if value["PR_Fraction"].is_null() {
+                    self.pr_fraction = -1.0;
+                    return Ok(());
+                }
+                let pr_fraction = value["PR_Fraction"].as_f64().unwrap();
+                self.pr_fraction = pr_fraction;
+            }
+        }
+
+        Ok(())
+    }
+
+
+    /* 
         Function: get_total
         Arguments: module_url - the name of the module the metric is graded for
         Return: None
@@ -226,9 +263,9 @@ impl Metrics {
         self.get_bus_factor(module_url).expect("Unable to get bus factor");
         self.get_responsiveness(module_url).expect("Unable to get responsiveness");
         self.get_license(module_url).expect("Unable to get license");
-
+        self.get_pr_fraction(module_url).expect("Unable to get pr_fraction");
         
-        self.total = ((self.ramp_up * 0.25) + (self.correctness * 0.2) + (self.bus_factor * 0.15) + (self.responsiveness * 0.4)) * self.license;
+        self.total = ((self.pr_fraction * 0.15) + (self.ramp_up * 0.20) + (self.correctness * 0.2) + (self.bus_factor * 0.15) + (self.responsiveness * 0.3)) * self.license;
     }  
 
     /* 
@@ -245,8 +282,8 @@ impl Metrics {
 
     pub fn get_metrics(&mut self, module_url: &str, api_url: &str) {
         self.get_total(module_url, api_url);
-        println!("{{\"URL\": \"{}\", \"NET_SCORE\": {:.2}, \"RAMP_UP_SCORE\": {}, \"CORRECTNESS_SCORE\": {}, \"BUS_FACTOR_SCORE\": {}, \"RESPONSIVE_MAINTAINER_SCORE\": {}, \"LICENSE_SCORE\": {}}}",
-        module_url, self.total, self.ramp_up, self.correctness, self.bus_factor, self.responsiveness, self.license
+        println!("{{\"URL\": \"{}\", \"NET_SCORE\": {:.2}, \"RAMP_UP_SCORE\": {}, \"CORRECTNESS_SCORE\": {}, \"BUS_FACTOR_SCORE\": {}, \"RESPONSIVE_MAINTAINER_SCORE\": {}, \"PULL_REQUEST_FRACTION_SCORE\": {}, \"LICENSE_SCORE\": {}}}",
+        module_url, self.total, self.ramp_up, self.correctness, self.bus_factor, self.responsiveness, self.pr_fraction, self.license
         );
     }
     
@@ -292,5 +329,11 @@ impl Metrics {
             .arg("src/inputs/commands/metrics.json")
             .output()
             .expect("failed to execute bus factor process");
+        Command::new("python3")
+            .arg("src/inputs/commands/pr_fraction.py")
+            .arg(url)
+            .arg("src/inputs/commands/metrics.json")
+            .output()
+            .expect("failed to execute pr_fraction process");
     }
   }
