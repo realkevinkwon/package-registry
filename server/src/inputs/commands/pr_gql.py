@@ -15,7 +15,7 @@ def pr_fraction_gql(owner_repo, list_of_files, token):
 
   # Loop through pages of results until no more pages
   while has_next_page:
-    # GraphQL query
+    # GraphQL query that filters merged and reviewed (at least once) Pulled Requests
       query = """
       query($owner: String!, $name: String!, $pageSize: Int!, $endCursor: String) {
         repository(owner: $owner, name: $name) {
@@ -28,6 +28,9 @@ def pr_fraction_gql(owner_repo, list_of_files, token):
                   additions
                   deletions
                 }
+              }
+              reviews(first: 1) {
+                totalCount
               }
             }
             pageInfo {
