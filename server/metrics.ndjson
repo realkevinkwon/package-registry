@@ -1,5 +1,0 @@
-{"metric":"RAMP_UP_SCORE", "api":"clone", "filepath":"src/inputs/commands/rampup.py", "line":"31"}
-{"metric":"CORRECTNESS_SCORE", "api":"graphql", "filepath":"src/inputs/commands/correctness.py", "line":"29-30, 62-63"}
-{"metric":"BUS_FACTOR_SCORE", "api":"rest", "filepath":"src/inputs/commands/metric_busfactor.py", "line":"38-39"}
-{"metric":"RESPONSIVE_MAINTAINER_SCORE", "api":"rest", "filepath":"src/inputs/commands/responsive.py", "line":"38-39, 44-45, 50-51"}
-{"metric":"LICENSE_SCORE", "api":"rest", "filepath":"src/inputs/commands/metric_license.py", "line":"16-17"}
