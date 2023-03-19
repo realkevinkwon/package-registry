@@ -1,4 +1,4 @@
-# ACME Registry
+# Package Registry
 
 ## Authors
 
