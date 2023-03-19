@@ -1,0 +1,9 @@
+apiVersion: skaffold/v3alpha1
+kind: Config
+metadata:
+  name: main-service
+manifests:
+  rawYaml:
+  - service.yaml
+deploy:
+  cloudrun: {}
