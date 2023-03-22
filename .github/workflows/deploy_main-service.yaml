@@ -86,7 +86,7 @@ env:
   PROJECT_ID: package-registry-team11 # Google Cloud project id
   GAR_REPO: main-service-dev # Artifact Registry location
   REGION: us-central1 # Cloud Run service region
-  SRC_PATH: ../../app-server/main-service
+  SRC_PATH: ./app-server/main-service
   SERVICE: main-service # Cloud Run service name
 
 jobs:
