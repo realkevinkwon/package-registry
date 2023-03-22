@@ -121,7 +121,7 @@ jobs:
 
       - name: 'Build and push container image'
         run: |-
-          docker build -t "${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.GAR_REPO }}/${{ env.SERVICE }}.image:${{ github.sha }}" -f ${{ env.SRC_PATH }}
+          docker build -t "${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.GAR_REPO }}/${{ env.SERVICE }}.image:${{ github.sha }}" -f ${{ env.SRC_PATH }} ${{ env.SRC_PATH }}
           docker push "${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.GAR_REPO }}/${{ env.SERVICE }}.image:${{ github.sha }}"
 
       - name: 'Create release name'
