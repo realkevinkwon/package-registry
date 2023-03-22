@@ -14,16 +14,16 @@
 #
 # 1. Ensure the required Google Cloud APIs are enabled:
 #
-#    Cloud Run            run.googleapis.com
-#    Artifact Registry    artifactregistry.googleapis.com
+#    Cloud Deploy
+#    Artifact Registry
 #
 # 2. Create and configure Workload Identity Federation for GitHub (https://github.com/google-github-actions/auth#setting-up-workload-identity-federation)
 #
-# 3. Ensure the required IAM permissions are granted
+# 3. Ensure the required IAM permissions are granted (NOTE: this just uses the default Compute Engine service account which has the requisite permissions)
 #
-#    Cloud Run
-#      roles/run.admin
-#      roles/iam.serviceAccountUser     (to act as the Cloud Run runtime service account)
+#    Cloud Deploy (permissions not accurate; needs updating if using custom service account)
+#      roles/clouddeploy.releaser
+#      roles/iam.serviceAccountUser     (to act as the Cloud Deploy runtime service account)
 #
 #    Artifact Registry
 #      roles/artifactregistry.admin     (project or repository level)
@@ -32,17 +32,17 @@
 #
 # 4. Create GitHub secrets for WIF_PROVIDER and WIF_SERVICE_ACCOUNT
 #
-# 5. Change the values for the GAR_LOCATION, SERVICE and REGION environment variables (below).
+# 5. Change the values for the PROJECT_ID, GAR_LOCATION, SRC_PATH, SERVICE, and REGION environment variables (below).
 #
 # For more support on how to run this workflow, please visit https://github.com/marketplace/actions/deploy-to-cloud-run
 #
 # Further reading:
-#   Cloud Run IAM permissions                 - https://cloud.google.com/run/docs/deploying
+#   Cloud Deploy IAM permissions              - https://cloud.google.com/deploy/docs/deploying-application
 #   Artifact Registry IAM permissions         - https://cloud.google.com/artifact-registry/docs/access-control#roles
 #   Container Registry vs Artifact Registry   - https://cloud.google.com/blog/products/application-development/understanding-artifact-registry-vs-container-registry
 #   Principle of least privilege              - https://cloud.google.com/blog/products/identity-security/dont-get-pwned-practicing-the-principle-of-least-privilege
 
-name: Build and Invoke Cloud Deploy
+name: Create a Cloud Deploy release
 
 on:
   pull_request:
@@ -80,21 +80,6 @@ jobs:
           token_format: 'access_token'
           workload_identity_provider: '${{ secrets.WIF_PROVIDER }}'
           service_account: '${{ secrets.WIF_SERVICE_ACCOUNT }}'
-
-      # Authenticate Docker to Google Cloud Artifact Registry.
-      # - name: Docker Auth
-      #   id: docker-auth
-      #   uses: 'docker/login-action@v1'
-      #   with:
-      #     username: 'oauth2accesstoken'
-      #     password: '${{ steps.auth.outputs.access_token }}'
-      #     registry: '${{ env.GAR_LOCATION }}-docker.pkg.dev'
-
-      # #
-      # - name: Build and Push Container
-      #   run: |-
-      #     docker build -t "${{ env.GAR_LOCATION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.SERVICE }}:${{ github.sha }}" ./
-      #     docker push "${{ env.GAR_LOCATION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.SERVICE }}:${{ github.sha }}"
 
       # Get current date and time
       - name: Get timestamp
