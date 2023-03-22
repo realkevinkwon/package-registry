@@ -54,11 +54,12 @@ on:
 env:
   PROJECT_ID: package-registry-team11 # Google Cloud project id
   GAR_LOCATION: main-service-dev # Artifact Registry location
+  SRC_PATH: '../../app-server/main-service'
   SERVICE: main-service # Cloud Run service name
   REGION: us-central1 # Cloud Run service region
 
 jobs:
-  deploy_main-service:
+  deploy-main-service:
     name: Deploy main-service
     # Add 'id-token' with the intended permissions for workload identity federation
     permissions:
@@ -67,39 +68,46 @@ jobs:
 
     runs-on: ubuntu-latest
     steps:
+      # Checkout repository for workflow access.
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Google Auth
+      # Authenticate with GCP using OIDC token.
+      - name: Google Authentication
         id: auth
-        uses: 'google-github-actions/auth@v0'
+        uses: 'google-github-actions/auth@v1'
         with:
           token_format: 'access_token'
           workload_identity_provider: '${{ secrets.WIF_PROVIDER }}'
           service_account: '${{ secrets.WIF_SERVICE_ACCOUNT }}'
 
-      # BEGIN - Docker auth and build (NOTE: If you already have a container image, these Docker steps can be omitted)
+      # Authenticate Docker to Google Cloud Artifact Registry.
+      # - name: Docker Auth
+      #   id: docker-auth
+      #   uses: 'docker/login-action@v1'
+      #   with:
+      #     username: 'oauth2accesstoken'
+      #     password: '${{ steps.auth.outputs.access_token }}'
+      #     registry: '${{ env.GAR_LOCATION }}-docker.pkg.dev'
 
-      # Authenticate Docker to Google Cloud Artifact Registry
-      - name: Docker Auth
-        id: docker-auth
-        uses: 'docker/login-action@v1'
-        with:
-          username: 'oauth2accesstoken'
-          password: '${{ steps.auth.outputs.access_token }}'
-          registry: '${{ env.GAR_LOCATION }}-docker.pkg.dev'
+      # #
+      # - name: Build and Push Container
+      #   run: |-
+      #     docker build -t "${{ env.GAR_LOCATION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.SERVICE }}:${{ github.sha }}" ./
+      #     docker push "${{ env.GAR_LOCATION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.SERVICE }}:${{ github.sha }}"
 
-      - name: Build and Push Container
-        run: |-
-          docker build -t "${{ env.GAR_LOCATION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.SERVICE }}:${{ github.sha }}" ./
-          docker push "${{ env.GAR_LOCATION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.SERVICE }}:${{ github.sha }}"
+      # Get current date and time
+      - name: Get timestamp
+        id: time
+        run: echo "::set-output name=time::$(date +'%F-%T')"
 
-      # END - Docker auth and build
-
+      # Create Cloud Deploy release for existing delivery pipeline.
       - name: Create release
         id: create-release
         uses: 'google-github-actions/create-cloud-deploy-release@v0.1.0'
         with:
-          name: 'something'
+          name: 'main-service-release-${{ steps.time.outputs.time }}'
           delivery_pipeline: '${{ env.SERVICE }}-pipeline'
+          source: ${{ env.SRC_PATH }}
           region: ${{ env.REGION }}
+          build_artifacts: '${{ env.SRC_PATH }}/skaffold.yaml'
