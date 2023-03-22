@@ -1,5 +1,0 @@
-steps:
-- name: 'gcr.io/cloud-builders/docker'
-  args: ['build', '-t', 'us-central1-docker.pkg.dev/package-registry-team11/main-service-dev/main-service.image:tag1', '.']
-images:
-- 'us-central1-docker.pkg.dev/package-registry-team11/main-service-dev/main-service.image:tag1'
