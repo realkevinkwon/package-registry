@@ -1,4 +1,6 @@
-# This workflow build and push a Docker container to Google Artifact Registry and deploy it on Cloud Run when a commit is pushed to the "main" branch
+# This workflow build and push a Docker container to Google Artifact Registry
+# and invoke Cloud Deploy when a pull request is approved on the 'main' branch
+# and files in 'app-server/main-service/' have changed.
 #
 # Overview:
 #
@@ -6,7 +8,7 @@
 # 2. Authenticate Docker to Artifact Registry
 # 3. Build a docker container
 # 4. Publish it to Google Artifact Registry
-# 5. Deploy it to Cloud Run
+# 5. Invoke Cloud Deploy
 #
 # To configure this workflow:
 #
@@ -32,8 +34,6 @@
 #
 # 5. Change the values for the GAR_LOCATION, SERVICE and REGION environment variables (below).
 #
-# NOTE: To use Google Container Registry instead, replace ${{ env.GAR_LOCATION }}-docker.pkg.dev with gcr.io
-#
 # For more support on how to run this workflow, please visit https://github.com/marketplace/actions/deploy-to-cloud-run
 #
 # Further reading:
@@ -42,20 +42,24 @@
 #   Container Registry vs Artifact Registry   - https://cloud.google.com/blog/products/application-development/understanding-artifact-registry-vs-container-registry
 #   Principle of least privilege              - https://cloud.google.com/blog/products/identity-security/dont-get-pwned-practicing-the-principle-of-least-privilege
 
-name: Build and Deploy to Cloud Run
+name: Build and Invoke Cloud Deploy
 
 on:
-  push:
-    branches: [ "main" ]
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'app-server/main-service/**'
 
 env:
-  PROJECT_ID: YOUR_PROJECT_ID # TODO: update Google Cloud project id
-  GAR_LOCATION: YOUR_GAR_LOCATION # TODO: update Artifact Registry location
-  SERVICE: YOUR_SERVICE_NAME # TODO: update Cloud Run service name
-  REGION: YOUR_SERVICE_REGION # TODO: update Cloud Run service region
+  PROJECT_ID: package-registry-team11 # Google Cloud project id
+  GAR_LOCATION: main-service-dev # Artifact Registry location
+  SERVICE: main-service # Cloud Run service name
+  REGION: us-central1 # Cloud Run service region
 
 jobs:
-  deploy:
+  deploy_main-service:
+    name: Deploy main-service
     # Add 'id-token' with the intended permissions for workload identity federation
     permissions:
       contents: 'read'
@@ -64,22 +68,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Google Auth
         id: auth
         uses: 'google-github-actions/auth@v0'
         with:
           token_format: 'access_token'
-          workload_identity_provider: '${{ secrets.WIF_PROVIDER }}' # e.g. - projects/123456789/locations/global/workloadIdentityPools/my-pool/providers/my-provider
-          service_account: '${{ secrets.WIF_SERVICE_ACCOUNT }}' # e.g. - my-service-account@my-project.iam.gserviceaccount.com
-
-      # NOTE: Alternative option - authentication via credentials json
-      # - name: Google Auth
-      #   id: auth
-      #   uses: 'google-github-actions/auth@v0'
-      #   with:
-      #     credentials_json: '${{ secrets.GCP_CREDENTIALS }}''
+          workload_identity_provider: '${{ secrets.WIF_PROVIDER }}'
+          service_account: '${{ secrets.WIF_SERVICE_ACCOUNT }}'
 
       # BEGIN - Docker auth and build (NOTE: If you already have a container image, these Docker steps can be omitted)
 
@@ -99,15 +96,10 @@ jobs:
 
       # END - Docker auth and build
 
-      - name: Deploy to Cloud Run
-        id: deploy
-        uses: google-github-actions/deploy-cloudrun@v0
+      - name: Create release
+        id: create-release
+        uses: 'google-github-actions/create-cloud-deploy-release@v0.1.0'
         with:
-          service: ${{ env.SERVICE }}
+          name: 'something'
+          delivery_pipeline: '${{ env.SERVICE }}-pipeline'
           region: ${{ env.REGION }}
-          # NOTE: If using a pre-built image, update the image name here
-          image: ${{ env.GAR_LOCATION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.SERVICE }}:${{ github.sha }}
-
-      # If required, use the Cloud Run url output in later steps
-      - name: Show Output
-        run: echo ${{ steps.deploy.outputs.url }}
