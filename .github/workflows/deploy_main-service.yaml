@@ -46,6 +46,8 @@ name: Create a Cloud Deploy release
 
 on:
   pull_request:
+    types:
+      - closed
     branches:
       - main
     paths:
@@ -60,6 +62,7 @@ env:
 
 jobs:
   deploy-main-service:
+    if: github.event.pull_request.merged == true
     name: Deploy main-service
     # Add 'id-token' with the intended permissions for workload identity federation
     permissions:
