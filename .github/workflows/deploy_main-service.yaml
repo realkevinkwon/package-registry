@@ -1,48 +1,79 @@
-# This workflow build and push a Docker container to Google Artifact Registry
-# and invoke Cloud Deploy when a pull request is approved on the 'main' branch
-# and files in 'app-server/main-service/' have changed.
+# This workflow builds and pushes a Docker container to Google Artifact Registry
+# and creates a release in Cloud Deploy using a declarative YAML Service
+# specification (service-*.yaml) when a commit is pushed to the $default-branch branch.
 #
 # Overview:
 #
 # 1. Authenticate to Google Cloud
-# 2. Authenticate Docker to Artifact Registry
-# 3. Build a docker container
+# 2. Configure Docker for Artifact Registry
+# 3. Build a container image
 # 4. Publish it to Google Artifact Registry
-# 5. Invoke Cloud Deploy
+# 5. Create YAML manifests from templates
+# 6. Create a Cloud Deploy delivery pipeline and targets (staging and production)
+# 7. Create a Cloud Deploy release to deploy the container image to Cloud Run
 #
 # To configure this workflow:
 #
 # 1. Ensure the required Google Cloud APIs are enabled:
 #
-#    Cloud Deploy
-#    Artifact Registry
+#    Cloud Build          cloudbuild.googleapis.com
+#    Cloud Deploy         clouddeploy.googleapis.com
+#    Cloud Run            run.googleapis.com
+#    Artifact Registry    artifactregistry.googleapis.com
 #
 # 2. Create and configure Workload Identity Federation for GitHub (https://github.com/google-github-actions/auth#setting-up-workload-identity-federation)
 #
-# 3. Ensure the required IAM permissions are granted (NOTE: this just uses the default Compute Engine service account which has the requisite permissions)
-#
-#    Cloud Deploy (permissions not accurate; needs updating if using custom service account)
-#      roles/clouddeploy.releaser
-#      roles/iam.serviceAccountUser     (to act as the Cloud Deploy runtime service account)
+# 3. Ensure the required IAM permissions are granted to the service account configured in
+#    Workload Identity Federation:
 #
 #    Artifact Registry
-#      roles/artifactregistry.admin     (project or repository level)
+#      roles/artifactregistry.writer    (Project or repository level)
+#
+#    Cloud Deploy
+#      roles/clouddeploy.operator       (To configure Cloud Deploy)
+#
+#    Cloud Storage
+#      roles/storage.admin              (To write release packages)
+#
+# 4. Ensure the required IAM permissions are granted to the default compute
+#    service account:
+#
+#    Cloud Logging
+#      roles/logging.logWriter          (To write logs)
+#
+#    Cloud Run
+#      roles/run.developer              (To create Cloud Run services)
+#
+#    Cloud Storage
+#      storage/object.viewer            (To read Cloud Deploy artifacts)
+#      storage/object.creator           (To write Cloud Deploy artifacts)
+#
+#    Additionally, the default compute service account requires permissions to "ActAs" itself
+#    to be able to deploy to Cloud Run. You can add this permission with the following command:
+#
+#    gcloud iam service-accounts add-iam-policy-binding $(gcloud projects describe ${PROJECT_ID} \
+#    --format="value(projectNumber)")-compute@developer.gserviceaccount.com \
+#    --member="serviceAccount:$(gcloud projects describe ${PROJECT_ID}\
+#    --format="value(projectNumber)")-compute@developer.gserviceaccount.com" \
+#    --role="roles/iam.serviceAccountUser"
 #
 #    NOTE: You should always follow the principle of least privilege when assigning IAM roles
 #
-# 4. Create GitHub secrets for WIF_PROVIDER and WIF_SERVICE_ACCOUNT
+# 5. Create GitHub secrets for WIF_PROVIDER and WIF_SERVICE_ACCOUNT
 #
-# 5. Change the values for the PROJECT_ID, GAR_LOCATION, SRC_PATH, SERVICE, and REGION environment variables (below).
+# 6. Change the values for the PROJECT_ID, GAR_LOCATION, REGION, SRC_PATH, and SERVICE environment variables (below).
 #
-# For more support on how to run this workflow, please visit https://github.com/marketplace/actions/deploy-to-cloud-run
+# NOTE: To use Google Container Registry instead, replace ${{ env.GAR_LOCATION }}-docker.pkg.dev with gcr.io
+#
+# For more support on how to run this workflow, please visit https://github.com/marketplace/actions/create-cloud-deploy-release
 #
 # Further reading:
-#   Cloud Deploy IAM permissions              - https://cloud.google.com/deploy/docs/deploying-application
-#   Artifact Registry IAM permissions         - https://cloud.google.com/artifact-registry/docs/access-control#roles
-#   Container Registry vs Artifact Registry   - https://cloud.google.com/blog/products/application-development/understanding-artifact-registry-vs-container-registry
-#   Principle of least privilege              - https://cloud.google.com/blog/products/identity-security/dont-get-pwned-practicing-the-principle-of-least-privilege
+#   Cloud Deploy IAM permissions              - https://cloud.google.com/deploy/docs/iam-roles-permissions
+#   Cloud Run IAM permissions                 - https://cloud.google.com/run/docs/deploying
+#   Cloud Run IAM roles                       - https://cloud.google.com/run/docs/reference/iam/roles
+#   Cloud Run targets in Cloud Deploy         - https://cloud.google.com/deploy/docs/run-targets
 
-name: Create a Cloud Deploy release
+name: Build main-service and create a release in Cloud Deploy
 
 on:
   pull_request:
@@ -55,15 +86,14 @@ on:
 
 env:
   PROJECT_ID: package-registry-team11 # Google Cloud project id
-  GAR_LOCATION: main-service-dev # Artifact Registry location
-  SRC_PATH: '../../app-server/main-service'
-  SERVICE: main-service # Cloud Run service name
+  GAR_REPO: main-service-dev # Artifact Registry location
   REGION: us-central1 # Cloud Run service region
+  SRC_PATH: ../../app-server/main-service # Path to service
+  SERVICE: main-service # Cloud Run service name
 
 jobs:
-  deploy-main-service:
+  deploy:
     if: github.event.pull_request.merged == true
-    name: Deploy main-service
     # Add 'id-token' with the intended permissions for workload identity federation
     permissions:
       contents: 'read'
@@ -71,31 +101,47 @@ jobs:
 
     runs-on: ubuntu-latest
     steps:
-      # Checkout repository for workflow access.
-      - name: Checkout
-        uses: actions/checkout@v3
+      - name: 'Checkout'
+        uses: 'actions/checkout@v3'
 
-      # Authenticate with GCP using OIDC token.
-      - name: Google Authentication
-        id: auth
+      - name: 'Google auth'
+        id: 'auth'
         uses: 'google-github-actions/auth@v1'
         with:
           token_format: 'access_token'
           workload_identity_provider: '${{ secrets.WIF_PROVIDER }}'
           service_account: '${{ secrets.WIF_SERVICE_ACCOUNT }}'
 
-      # Get current date and time
-      - name: Get timestamp
-        id: time
-        run: echo "::set-output name=time::$(date +'%F-%T')"
+      - name: 'Set up Cloud SDK'
+        uses: 'google-github-actions/setup-gcloud@v1'
+        with:
+          project_id: '${{ env.PROJECT_ID }}'
 
-      # Create Cloud Deploy release for existing delivery pipeline.
-      - name: Create release
-        id: create-release
+      - name: 'Docker auth'
+        run: |-
+          gcloud auth configure-docker ${{ env.REGION }}-docker.pkg.dev
+
+      - name: 'Build and push container image'
+        run: |-
+          docker build -t "${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.GAR_REPO }}/${{ env.SERVICE }}.image:${{ github.sha }}" ${{ env.SRC_PATH }}
+          docker push "${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.GAR_REPO }}/${{ env.SERVICE }}.image:${{ github.sha }}"
+
+      - name: 'Create release name'
+        run: |-
+          echo "RELEASE_NAME=${{ env.SERVICE }}-${GITHUB_SHA::7}-${GITHUB_RUN_NUMBER}" >> ${GITHUB_ENV}
+
+      - name: 'Create Cloud Deploy release'
+        id: 'release'
         uses: 'google-github-actions/create-cloud-deploy-release@v0.1.0'
         with:
-          name: 'main-service-release-${{ steps.time.outputs.time }}'
-          delivery_pipeline: '${{ env.SERVICE }}-pipeline'
-          source: ${{ env.SRC_PATH }}
-          region: ${{ env.REGION }}
-          build_artifacts: '${{ env.SRC_PATH }}/skaffold.yaml'
+          delivery_pipeline: '${{ env.SERVICE }}'
+          name: '${{ env.RELEASE_NAME }}'
+          region: '${{ env.REGION }}'
+          description: '${{ env.GITHUB_COMMIT_MSG }}'
+          skaffold_file: '${{ env.SRC_PATH }}/skaffold.yaml'
+          images: 'app=${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.GAR_REPO }}/${{ env.SERVICE }}.image:${{ github.sha }}'
+
+      - name: 'Report Cloud Deploy release'
+        run: |-
+          echo "Created release ${{ steps.release.outputs.name }}"
+          echo "Release link ${{ steps.release.outputs.link }}"
