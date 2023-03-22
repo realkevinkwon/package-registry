@@ -6,4 +6,4 @@ spec:
   template:
     spec:
       containers:
-      - image: 'us-central1-docker.pkg.dev/package-registry-team11/main-service-dev/main-service.image:tag1'
+      - image: 'us-central1-docker.pkg.dev/package-registry-team11/main-service-dev/main-service.image'
