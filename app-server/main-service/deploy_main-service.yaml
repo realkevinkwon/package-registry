@@ -63,8 +63,6 @@
 #
 # 6. Change the values for the PROJECT_ID, GAR_LOCATION, REGION, SRC_PATH, and SERVICE environment variables (below).
 #
-# NOTE: To use Google Container Registry instead, replace ${{ env.GAR_LOCATION }}-docker.pkg.dev with gcr.io
-#
 # For more support on how to run this workflow, please visit https://github.com/marketplace/actions/create-cloud-deploy-release
 #
 # Further reading:
@@ -88,7 +86,6 @@ env:
   PROJECT_ID: package-registry-team11 # Google Cloud project id
   GAR_REPO: main-service-dev # Artifact Registry location
   REGION: us-central1 # Cloud Run service region
-  SRC_PATH: ../../app-server/main-service # Path to service
   SERVICE: main-service # Cloud Run service name
 
 jobs:
@@ -123,7 +120,7 @@ jobs:
 
       - name: 'Build and push container image'
         run: |-
-          docker build -t "${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.GAR_REPO }}/${{ env.SERVICE }}.image:${{ github.sha }}" ${{ env.SRC_PATH }}
+          docker build -t "${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.GAR_REPO }}/${{ env.SERVICE }}.image:${{ github.sha }}" .
           docker push "${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.GAR_REPO }}/${{ env.SERVICE }}.image:${{ github.sha }}"
 
       - name: 'Create release name'
@@ -138,7 +135,7 @@ jobs:
           name: '${{ env.RELEASE_NAME }}'
           region: '${{ env.REGION }}'
           description: '${{ env.GITHUB_COMMIT_MSG }}'
-          skaffold_file: '${{ env.SRC_PATH }}/skaffold.yaml'
+          skaffold_file: 'skaffold.yaml'
           images: 'main-service-image=${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.GAR_REPO }}/${{ env.SERVICE }}.image:${{ github.sha }}'
 
       - name: 'Report Cloud Deploy release'
