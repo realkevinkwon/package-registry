@@ -1,0 +1,9 @@
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: 'query-cost-service-prod'
+spec:
+  template:
+    spec:
+      containers:
+        - image: 'query-cost-service-image'
