@@ -1,0 +1,21 @@
+apiVersion: skaffold/v3alpha1
+kind: Config
+metadata:
+  name: 'fetch-history-service'
+deploy:
+  cloudrun: {}
+profiles:
+  - name: 'dev'
+    manifests:
+      rawYaml:
+        - 'dev.yaml'
+
+  - name: 'staging'
+    manifests:
+      rawYaml:
+        - 'staging.yaml'
+
+  - name: 'prod'
+    manifests:
+      rawYaml:
+        - 'prod.yaml'
