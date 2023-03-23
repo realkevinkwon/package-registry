@@ -1,0 +1,9 @@
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: 'fetch-directory-service-dev'
+spec:
+  template:
+    spec:
+      containers:
+        - image: 'fetch-directory-service-image'
