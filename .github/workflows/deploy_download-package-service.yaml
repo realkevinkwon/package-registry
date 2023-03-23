@@ -71,7 +71,7 @@
 #   Cloud Run IAM roles                       - https://cloud.google.com/run/docs/reference/iam/roles
 #   Cloud Run targets in Cloud Deploy         - https://cloud.google.com/deploy/docs/run-targets
 
-name: Build main-service and create a release in Cloud Deploy
+name: Build download-package-service and create a release in Cloud Deploy
 
 on:
   pull_request:
@@ -80,14 +80,14 @@ on:
     branches:
       - main
     paths:
-      - 'app-server/main-service/**'
+      - 'app-server/services/download-package-service/**'
 
 env:
   PROJECT_ID: package-registry-team11 # Google Cloud project id
-  GAR_REPO: main-service # Artifact Registry location
+  GAR_REPO: download-package-service # Artifact Registry location
   REGION: us-central1 # Cloud Run service region
-  SRC_PATH: ./app-server/main-service
-  SERVICE: main-service # Cloud Run service name
+  SRC_PATH: ./app-server/services/download-package-service
+  SERVICE: download-package-service # Cloud Run service name
 
 jobs:
   deploy:
