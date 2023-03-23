@@ -1,7 +1,7 @@
 apiVersion: skaffold/v3alpha1
 kind: Config
 metadata:
-  name: 'main-service'
+  name: 'download-package-service'
 deploy:
   cloudrun: {}
 profiles:
