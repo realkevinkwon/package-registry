@@ -132,7 +132,7 @@ jobs:
         id: 'release'
         uses: 'google-github-actions/create-cloud-deploy-release@v0.1.0'
         with:
-          delivery_pipeline: '${{ env.SERVICE }}'
+          delivery_pipeline: '${{ env.SERVICE }}-pipeline'
           name: '${{ env.RELEASE_NAME }}'
           region: '${{ env.REGION }}'
           description: '${{ env.GITHUB_COMMIT_MSG }}'
