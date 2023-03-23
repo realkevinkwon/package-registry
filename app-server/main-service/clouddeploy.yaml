@@ -1,39 +1,33 @@
 apiVersion: deploy.cloud.google.com/v1
 kind: DeliveryPipeline
 metadata:
- name: main-service-pipeline
+ name: 'main-service-pipeline'
 serialPipeline:
- stages:
- - targetId: dev
-   profiles: []
- - targetId: staging
-   profiles: []
- - targetId: prod
-   profiles: []
-
+  stages:
+    - targetId: 'dev'
+      profiles: ['dev']
+    - targetId: 'staging'
+      profiles: ['staging']
+    - targetId: 'prod'
+      profiles: ['prod']
 ---
-
 apiVersion: deploy.cloud.google.com/v1
 kind: Target
 metadata:
- name: dev
+  name: 'dev'
 run:
- location: projects/package-registry-team11/locations/us-central1
-
+  location: 'projects/package-registry-team11/locations/us-central1'
 ---
-
 apiVersion: deploy.cloud.google.com/v1
 kind: Target
 metadata:
- name: staging
+  name: 'staging'
 run:
- location: projects/package-registry-team11/locations/us-central1
-
+  location: 'projects/package-registry-team11/locations/us-central1'
 ---
-
 apiVersion: deploy.cloud.google.com/v1
 kind: Target
 metadata:
- name: prod
+  name: 'prod'
 run:
- location: projects/package-registry-team11/locations/us-central1
+  location: 'projects/package-registry-team11/locations/us-central1'
