@@ -1,0 +1,9 @@
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: 'rate-package-service-staging'
+spec:
+  template:
+    spec:
+      containers:
+        - image: 'rate-package-service-image'
