@@ -1,0 +1,9 @@
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: 'update-package-service-dev'
+spec:
+  template:
+    spec:
+      containers:
+        - image: 'update-package-service-image'
