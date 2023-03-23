@@ -1,0 +1,9 @@
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: 'reset-system-service-dev'
+spec:
+  template:
+    spec:
+      containers:
+        - image: 'reset-system-service-image'
