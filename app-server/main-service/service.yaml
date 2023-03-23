@@ -1,9 +1,0 @@
-apiVersion: serving.knative.dev/v1
-kind: Service
-metadata:
-  name: main-service
-spec:
-  template:
-    spec:
-      containers:
-      - image: 'us-central1-docker.pkg.dev/package-registry-team11/main-service-dev/main-service.image'
