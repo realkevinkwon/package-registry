@@ -6,4 +6,4 @@ spec:
   template:
     spec:
       containers:
-        - image: '${{ env.RELEASE_NAME }}'
+        - image: 'main-service-image'

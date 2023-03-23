@@ -136,7 +136,6 @@ jobs:
           name: '${{ env.RELEASE_NAME }}'
           region: '${{ env.REGION }}'
           description: '${{ env.GITHUB_COMMIT_MSG }}'
-          skaffold_file: '${{ env.SRC_PATH }}/skaffold.yaml'
           images: 'main-service-image=${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.GAR_REPO }}/${{ env.SERVICE }}.image:${{ github.sha }}'
 
       - name: 'Report Cloud Deploy release'
