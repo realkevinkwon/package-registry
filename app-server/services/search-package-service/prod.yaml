@@ -1,9 +1,0 @@
-apiVersion: serving.knative.dev/v1
-kind: Service
-metadata:
-  name: 'search-package-service-prod'
-spec:
-  template:
-    spec:
-      containers:
-        - image: 'search-package-service-image'

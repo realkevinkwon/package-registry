@@ -1,9 +1,0 @@
-apiVersion: serving.knative.dev/v1
-kind: Service
-metadata:
-  name: 'upload-package-service-staging'
-spec:
-  template:
-    spec:
-      containers:
-        - image: 'upload-package-service-image'
