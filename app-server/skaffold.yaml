@@ -1,7 +1,7 @@
 apiVersion: skaffold/v3alpha1
 kind: Config
 metadata:
-  name: 'main-service'
+  name: 'app-server'
 manifests:
   rawYaml:
     - 'service.yaml'

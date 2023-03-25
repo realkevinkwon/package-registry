@@ -84,10 +84,8 @@ on:
 
 env:
   PROJECT_ID: package-registry-team11 # Google Cloud project id
-  GAR_REPO: download-package-service # Artifact Registry location
   REGION: us-central1 # Cloud Run service region
   SRC_PATH: ./app-server
-  SERVICE: download-package-service # Cloud Run service name
 
 jobs:
   deploy:
@@ -112,15 +110,25 @@ jobs:
 
       - name: 'Create release name'
         run: |-
-          echo "RELEASE_NAME=${{ env.SERVICE }}-${GITHUB_SHA::7}-${GITHUB_RUN_NUMBER}" >> ${GITHUB_ENV}
+          echo "RELEASE_NAME=app-server-${GITHUB_SHA::7}-${GITHUB_RUN_NUMBER}" >> ${GITHUB_ENV}
 
       - name: 'Create Cloud Deploy release'
         id: 'release'
         uses: 'google-github-actions/create-cloud-deploy-release@v0.1.0'
         with:
-          delivery_pipeline: '${{ env.SERVICE }}-pipeline'
+          delivery_pipeline: 'app-server-pipeline'
           name: '${{ env.RELEASE_NAME }}'
           region: '${{ env.REGION }}'
           description: '${{ env.GITHUB_COMMIT_MSG }}'
-          images: '${{ env.SERVICE }}-image=${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.GAR_REPO }}/${{ env.SERVICE }}.image:${{ github.sha }}'
-          source: '${{ env.SRC_PATH }}'
+          images: |-
+            'main-service-image=${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/main-service/main-service.image:${{ github.sha }}'
+            'download-package-service-image=${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/download-package-service/download-package-service.image:${{ github.sha }}'
+            'fetch-directory-service-image=${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/fetch-directory-service/fetch-directory-service.image:${{ github.sha }}'
+            'fetch-history-service-image=${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/fetch-history-service/main-service.image:${{ github.sha }}'
+            'ingest-package-service-image=${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/ingest-package-service/ingest-package-service.image:${{ github.sha }}'
+            'query-cost-service-image=${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/query-cost-service/query-cost-service.image:${{ github.sha }}'
+            'rate-package-service-image=${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/rate-package-service/rate-package-service.image:${{ github.sha }}'
+            'reset-system-service-image=${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/reset-system-service/reset-system-service.image:${{ github.sha }}'
+            'search-package-service-image=${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/search-package-service/search-package-service.image:${{ github.sha }}'
+            'update-package-service-image=${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/update-package-service/update-package-service.image:${{ github.sha }}'
+            'upload-package-service-image=${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/upload-package-service/upload-package-service.image:${{ github.sha }}'
