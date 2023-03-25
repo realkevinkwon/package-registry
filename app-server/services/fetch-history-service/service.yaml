@@ -1,0 +1,9 @@
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: 'fetch-history-service'
+spec:
+  template:
+    spec:
+      containers:
+        - image: 'fetch-history-service-image'
