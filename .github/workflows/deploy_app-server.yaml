@@ -85,7 +85,6 @@ on:
 env:
   PROJECT_ID: package-registry-team11 # Google Cloud project id
   REGION: us-central1 # Cloud Run service region
-  SRC_PATH: ./app-server
 
 jobs:
   deploy:
@@ -120,6 +119,7 @@ jobs:
           name: '${{ env.RELEASE_NAME }}'
           region: '${{ env.REGION }}'
           description: '${{ env.GITHUB_COMMIT_MSG }}'
+          source: './app-server/skaffold.yaml'
           images: |-
             'main-service-image=${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/main-service/main-service.image:${{ github.sha }}'
             'download-package-service-image=${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/download-package-service/download-package-service.image:${{ github.sha }}'
