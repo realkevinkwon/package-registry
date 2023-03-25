@@ -71,7 +71,7 @@
 #   Cloud Run IAM roles                       - https://cloud.google.com/run/docs/reference/iam/roles
 #   Cloud Run targets in Cloud Deploy         - https://cloud.google.com/deploy/docs/run-targets
 
-name: Build download-package-service and create a release in Cloud Deploy
+name: Create a release in Cloud Deploy
 
 on:
   pull_request:
@@ -80,13 +80,13 @@ on:
     branches:
       - main
     paths:
-      - 'app-server/services/download-package-service/**'
+      - 'app-server/**'
 
 env:
   PROJECT_ID: package-registry-team11 # Google Cloud project id
   GAR_REPO: download-package-service # Artifact Registry location
   REGION: us-central1 # Cloud Run service region
-  SRC_PATH: ./app-server/services/download-package-service
+  SRC_PATH: ./app-server
   SERVICE: download-package-service # Cloud Run service name
 
 jobs:
@@ -110,20 +110,6 @@ jobs:
           workload_identity_provider: '${{ secrets.WIF_PROVIDER }}'
           service_account: '${{ secrets.WIF_SERVICE_ACCOUNT }}'
 
-      - name: 'Set up Cloud SDK'
-        uses: 'google-github-actions/setup-gcloud@v1'
-        with:
-          project_id: '${{ env.PROJECT_ID }}'
-
-      - name: 'Docker auth'
-        run: |-
-          gcloud auth configure-docker ${{ env.REGION }}-docker.pkg.dev
-
-      - name: 'Build and push container image'
-        run: |-
-          docker build -t "${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.GAR_REPO }}/${{ env.SERVICE }}.image:${{ github.sha }}" "${{ env.SRC_PATH }}"
-          docker push "${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.GAR_REPO }}/${{ env.SERVICE }}.image:${{ github.sha }}"
-
       - name: 'Create release name'
         run: |-
           echo "RELEASE_NAME=${{ env.SERVICE }}-${GITHUB_SHA::7}-${GITHUB_RUN_NUMBER}" >> ${GITHUB_ENV}
@@ -138,8 +124,3 @@ jobs:
           description: '${{ env.GITHUB_COMMIT_MSG }}'
           images: '${{ env.SERVICE }}-image=${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.GAR_REPO }}/${{ env.SERVICE }}.image:${{ github.sha }}'
           source: '${{ env.SRC_PATH }}'
-
-      - name: 'Report Cloud Deploy release'
-        run: |-
-          echo "Created release ${{ steps.release.outputs.name }}"
-          echo "Release link ${{ steps.release.outputs.link }}"
