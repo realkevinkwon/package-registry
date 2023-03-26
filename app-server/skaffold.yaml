@@ -5,15 +5,15 @@ metadata:
 manifests:
   rawYaml:
     - 'main-service/service.yaml'
-    - 'download-package-service/service.yaml'
-    - 'fetch-directory-service/service.yaml'
-    - 'fetch-history-service/service.yaml'
-    - 'ingest-package-service/service.yaml'
-    - 'query-cost-service/service.yaml'
-    - 'rate-package-service/service.yaml'
-    - 'reset-system-service/service.yaml'
-    - 'search-package-service/service.yaml'
-    - 'update-package-service/service.yaml'
-    - 'upload-package-service/service.yaml'
+    - 'services/download-package-service/service.yaml'
+    - 'services/fetch-directory-service/service.yaml'
+    - 'services/fetch-history-service/service.yaml'
+    - 'services/ingest-package-service/service.yaml'
+    - 'services/query-cost-service/service.yaml'
+    - 'services/rate-package-service/service.yaml'
+    - 'services/reset-system-service/service.yaml'
+    - 'services/search-package-service/service.yaml'
+    - 'services/update-package-service/service.yaml'
+    - 'services/upload-package-service/service.yaml'
 deploy:
   cloudrun: {}
