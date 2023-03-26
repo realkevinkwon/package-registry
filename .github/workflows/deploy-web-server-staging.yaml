@@ -1,0 +1,43 @@
+name: 'Deploy web-server-staging and deploy to App Engine'
+
+on:
+  pull_request:
+    types:
+      - 'closed'
+    branches:
+      - 'staging'
+    paths:
+      - 'web-server/**'
+
+env:
+  PROJECT_ID: 'package-registry-team11'
+  REGION: 'us-central1'
+  SERVICE: 'web-server-staging'
+  SRC_PATH: 'web-server'
+
+jobs:
+  deploy:
+    if: github.event.pull_request.merged == true
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+
+    runs-on: 'ubuntu-latest'
+    steps:
+      - name: 'Checkout'
+        uses: 'actions/checkout@v3'
+
+      - name: 'Google auth'
+        id: 'auth'
+        uses: 'google-github-actions/auth@v1'
+        with:
+          token_format: 'access_token'
+          workload_identity_provider: '${{ secrets.WIF_PROVIDER }}'
+          service_account: '${{ secrets.WIF_SERVICE_ACCOUNT }}'
+
+      - name: 'Deploy to App Engine'
+        id: 'deploy'
+        uses: 'google-github-actions/deploy-appengine@v1'
+        with:
+          project_id: '${{ env.PROJECT_ID }}'
+          working_directory: '${{ env.SRC_PATH }}'
