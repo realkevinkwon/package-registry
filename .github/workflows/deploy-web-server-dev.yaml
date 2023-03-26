@@ -1,7 +1,7 @@
 name: 'Deploy web-server-dev and deploy to App Engine'
 
 on:
-  pull-request:
+  pull_request:
     types:
       - 'closed'
     branches:
