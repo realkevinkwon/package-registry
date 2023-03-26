@@ -1,0 +1,60 @@
+name: 'Build ingest-package-service-staging image and deploy to Cloud Run'
+
+on:
+  pull_request:
+    types:
+      - 'closed'
+    branches:
+      - 'staging'
+    paths:
+      - 'app-server/services/ingest-package-service/**'
+
+env:
+  PROJECT_ID: 'package-registry-team11'
+  REGION: 'us-central1'
+  SERVICE: 'ingest-package-service-staging'
+  GAR_REPO: 'ingest-package-service-staging'
+  SRC_PATH: 'app-server/services/ingest-package-service'
+
+jobs:
+  deploy:
+    if: github.event.pull_request.merged == true
+    # Add 'id-token' with the intended permissions for workload identity federation
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+
+    runs-on: 'ubuntu-latest'
+    steps:
+      - name: 'Checkout'
+        uses: 'actions/checkout@v3'
+
+      - name: 'Google auth'
+        id: 'auth'
+        uses: 'google-github-actions/auth@v1'
+        with:
+          token_format: 'access_token'
+          workload_identity_provider: '${{ secrets.WIF_PROVIDER }}'
+          service_account: '${{ secrets.WIF_SERVICE_ACCOUNT }}'
+
+      - name: 'Set up Cloud SDK'
+        uses: 'google-github-actions/setup-gcloud@v1'
+        with:
+          project_id: '${{ env.PROJECT_ID }}'
+
+      - name: 'Docker auth'
+        run: |-
+          gcloud auth configure-docker ${{ env.REGION }}-docker.pkg.staging
+
+      - name: 'Build and push container image'
+        run: |-
+          docker build -t "${{ env.REGION }}-docker.pkg.staging/${{ env.PROJECT_ID }}/${{ env.GAR_REPO }}/${{ env.SERVICE }}.image:${{ github.sha }}" "${{ env.SRC_PATH }}"
+          docker push "${{ env.REGION }}-docker.pkg.staging/${{ env.PROJECT_ID }}/${{ env.GAR_REPO }}/${{ env.SERVICE }}.image:${{ github.sha }}"
+
+      - name: 'Deploy to Cloud Run'
+        id: 'deploy'
+        uses: 'google-github-actions/deploy-cloudrun@v0'
+        with:
+          service: ${{ env.SERVICE }}
+          region: ${{ env.REGION }}
+          image: '${{ env.REGION }}-docker.pkg.staging/${{ env.PROJECT_ID }}/${{ env.GAR_REPO }}/${{ env.SERVICE }}.image:${{ github.sha }}'
