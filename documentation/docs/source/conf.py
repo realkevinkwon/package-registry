@@ -5,6 +5,7 @@
 
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
+import os
 
 project = 'package-directory'
 copyright = '2023, Philip Chu, Estebae Gorostiaga, Connor Hise, Kevin Kwon'
@@ -13,6 +14,15 @@ release = '0.1'
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
+
+# Path Setup
+import sys
+from os.path import dirname, abspath
+source_direc = abspath(__file__)
+source_direc = dirname(dirname(dirname(source_direc)))
+sys.path.insert(0, source_direc)
+#sys.path.append('../../')
+
 
 extensions = []
 
@@ -24,5 +34,5 @@ exclude_patterns = []
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 
-html_theme = 'alabaster'
+html_theme = 'sphinx_rtd_theme'
 html_static_path = ['_static']
