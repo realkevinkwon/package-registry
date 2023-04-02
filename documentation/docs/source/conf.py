@@ -23,6 +23,9 @@ source_direc = dirname(dirname(dirname(source_direc)))
 sys.path.insert(0, source_direc)
 #sys.path.append('../../')
 
+sys.path.insert(0,os.path.abspath("../../../../app-server"))
+sys.path.insert(0,os.path.abspath("../../../../web-server"))
+
 
 extensions = []
 

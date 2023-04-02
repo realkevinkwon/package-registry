@@ -10,6 +10,9 @@ package-directory is a pickle.
    :maxdepth: 2
    :caption: Contents:
 
+   app-server <app-server.rst>
+   web-server <web-server.rst>
+
 
 
 Indices and tables
