@@ -12,7 +12,7 @@ package-directory is a pickle.
 
    app-server <app-server.rst>
    web-server <web-server.rst>
-
+   modules
 
 
 Indices and tables

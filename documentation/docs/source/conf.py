@@ -16,16 +16,9 @@ release = '0.1'
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
 # Path Setup
-import sys
-from os.path import dirname, abspath
-source_direc = abspath(__file__)
-source_direc = dirname(dirname(dirname(source_direc)))
-sys.path.insert(0, source_direc)
-#sys.path.append('../../')
+import os, sys
 
-sys.path.insert(0,os.path.abspath("../../../../app-server"))
-sys.path.insert(0,os.path.abspath("../../../../web-server"))
-
+sys.path.append(os.path.abspath('../../'))
 
 extensions = []
 
