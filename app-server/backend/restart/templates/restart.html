@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h1>Restart Package Registry</h1>
+  <p>Are you sure you want to restart?</p>
+  <form method="post">
+    {% csrf_token %}
+    <button type="submit" name="restart" value="yes">Yes</button>
+    <button type="submit" name="restart" value="no">No</button>
+  </form>
+{% endblock %}
