@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>File List</h1>
+    <ul>
+        {% for file_name in file_names %}
+            <li>{{ file_name }}
+                <button type="button" class="btn btn-primary">View</button>
+                <form action="{% url 'download_file' %}" method="post" style="display: inline-block;">
+                    {% csrf_token %}
+                    <input type="hidden" name="file_name" value="{{ file_name }}">
+                    <button type="submit" class="btn btn-primary">Download</button>
+                </form>
+            </li>
+        {% endfor %}
+    </ul>
+{% endblock %}
