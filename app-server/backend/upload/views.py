@@ -5,6 +5,9 @@ from google.cloud import storage
 from django.conf import settings
 from .forms import UploadForm
 import re
+from rate import rate_func
+import zipfile
+import json
 
 os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = 'credentials-project2.json'
 
@@ -15,13 +18,21 @@ def upload_file(request):
             # Get the uploaded file
             uploaded_file = request.FILES['file']
             if uploaded_file.name.endswith('.zip'):
-                # Upload the file to Google Cloud Storage
-                storage_client = storage.Client()
-                bucket = storage_client.bucket(settings.GS_BUCKET_NAME)
-                blob = bucket.blob('Packages/' + uploaded_file.name)
-                blob.upload_from_file(uploaded_file)
-                # Redirect to a success page
-                return render(request, 'success.html')
+                try: url = getURLfrompackage()
+                except: form.add_error('file','Uploaded Package is not Viable')
+                try: rating = rate_func(url)
+                except: rating = -1
+                if(rating < 0.5):
+                    form.add_error('file','Uploaded Package is not High Enough Quality')
+                    return render(request, "failure.html")
+                else:
+                    # Upload the file to Google Cloud Storage
+                    storage_client = storage.Client()
+                    bucket = storage_client.bucket(settings.GS_BUCKET_NAME)
+                    blob = bucket.blob('Packages/' + uploaded_file.name)
+                    blob.upload_from_file(uploaded_file)
+                    # Redirect to a success page
+                    return render(request, 'success.html')
             else:
                 # Display an error message if the file extension is not "zip"
                 form.add_error('file', 'Only ZIP files are allowed.')
@@ -57,3 +68,9 @@ def download_file(request):
         return response
     else:
         return HttpResponse("Invalid request method.")
+    
+def getURLfrompackage(zipped):
+    with zipfile.ZipFile(zipped) as zip_file:
+        with zip_file.open("package.json") as json_file:
+            json_file_contents = json.load(json_file)
+            return json_file_contents.get('url', None)
