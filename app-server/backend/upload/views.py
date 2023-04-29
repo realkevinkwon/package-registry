@@ -5,6 +5,8 @@ from google.cloud import storage
 from django.conf import settings
 from .forms import UploadForm
 import re
+from models import Package
+from model_contents import getModelContents
 from rate import rate_func
 import zipfile
 import json
@@ -26,6 +28,9 @@ def upload_file(request):
                     form.add_error('file','Uploaded Package is not High Enough Quality')
                     return render(request, "failure.html")
                 else:
+                    # Retrieve information for model and upload to Google Cloud Storage
+                    [repo_name, popularity] = getModelContents(url)
+
                     # Upload the file to Google Cloud Storage
                     storage_client = storage.Client()
                     bucket = storage_client.bucket(settings.GS_BUCKET_NAME)

@@ -25,7 +25,15 @@ def getModelContents(link):
 
     # Go to funcs for individual score and version
     pop_score = getPopularity(repo_dir)
-    to_model = [repo_name, pop_score]
+    return [repo_name, pop_score]
+
+def getRepoID(repo_dir):
+    url = "https://api.github.com/repos/" + repo_dir
+    try: get_ID = requests.get(url)
+    except: return 0
+    json_contents = get_ID.json()
+    repo_ID = 0
+    
 
 def getPopularity(repo_dir):
     url = "https://api.github.com/repos/"+repo_dir+"/releases"
@@ -52,4 +60,7 @@ def getVersion(repo_dir):
     print("MR BEEEAAASSTT")
 
 if __name__ == '__main__':
-    getModelContents("git://github.com/axstin/rbxfpsunlocker.git")
+    [repo, repo_ID, popscore] = getModelContents("git://github.com/axstin/rbxfpsunlocker.git")
+    print(repo)
+    print(repo_ID)
+    print(popscore)
