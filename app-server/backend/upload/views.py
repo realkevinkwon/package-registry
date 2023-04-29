@@ -5,9 +5,8 @@ from google.cloud import storage
 from django.conf import settings
 from .forms import UploadForm
 import re
-from models import Package
-from model_contents import getModelContents
-from rate import rate_func
+# from upload import rate
+import rate
 import zipfile
 import json
 
@@ -20,23 +19,14 @@ def upload_file(request):
             # Get the uploaded file
             uploaded_file = request.FILES['file']
             if uploaded_file.name.endswith('.zip'):
-                try: url = getURLfrompackage()
+                try: url = getURLfrompackage(uploaded_file)
                 except: form.add_error('file','Uploaded Package is not Viable')
-                try: rating = rate_func(url)
+                try: rating = rate.rate_func(url)
                 except: rating = -1
                 if(rating < 0.5):
                     form.add_error('file','Uploaded Package is not High Enough Quality')
                     return render(request, "failure.html")
                 else:
-                    # Retrieve information for model
-                    # The Django package model requires repo name, ID, version, popularity, and overall metric score
-
-                    # Retrieve repository name, ID, and popularity
-                    [repo_name, repo_ID, popularity] = getModelContents(url)
-                    # Attempt to retrieve version number
-
-                    # Create model and upload to Google Cloud Storage (rating = overall metric score)
-
                     # Upload the file to Google Cloud Storage
                     storage_client = storage.Client()
                     bucket = storage_client.bucket(settings.GS_BUCKET_NAME)
@@ -82,12 +72,6 @@ def download_file(request):
     
 def getURLfrompackage(zipped):
     with zipfile.ZipFile(zipped) as zip_file:
-        with zip_file.open("../../../../../package.json") as json_file:
+        with zip_file.open("package.json") as json_file:
             json_file_contents = json.load(json_file)
             return json_file_contents.get('url', None)
-
-def getVersionfrompackage(zipped):
-    with zipfile.ZipFile(zipped) as zip_file:
-        with zip_file.open("../../../../../package.json") as json_file:
-            json_file_contents = json.load(json_file)
-            return json_file_contents.get('version', None)
