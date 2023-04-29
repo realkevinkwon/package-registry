@@ -4,7 +4,7 @@ import sys
 # import numpy as np
 # from dotenv import load_dotenv
 import os
-import valid_url as vu
+from .valid_url import *
 
 # load_dotenv()
 
@@ -121,8 +121,8 @@ def score(url, apiurl):
     return(license_score)
 
 def license_score(url):
-    if (vu.valid_url(url)):
-        apiurl = vu.get_api_url(url)
+    if (valid_url(url)):
+        apiurl = get_api_url(url)
         return(score(url, apiurl))
         
 # if __name__ == "__main__":

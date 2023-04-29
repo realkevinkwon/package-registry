@@ -4,7 +4,7 @@ import sys
 # import numpy as np
 import os
 # from dotenv import load_dotenv
-import valid_url as vu
+from .valid_url import *
 import math
 # load_dotenv()
 
@@ -116,8 +116,8 @@ def score(url, apiurl):
     return dependency_score
 
 def bus_factor_score(url):
-    if (vu.valid_url(url)):
-        apiurl = vu.get_api_url(url)
+    if (valid_url(url)):
+        apiurl = get_api_url(url)
         return(score(url, apiurl))
 
 # if __name__ == "__main__":
