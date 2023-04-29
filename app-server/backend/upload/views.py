@@ -4,9 +4,12 @@ from django.shortcuts import render
 from google.cloud import storage
 from django.conf import settings
 from .forms import UploadForm
+from .models import Packagey
+from .model_contents import getModelContents
+from .rate import rate_func
 import re
 # from upload import rate
-import rate
+# import rate
 import zipfile
 import json
 
@@ -21,12 +24,23 @@ def upload_file(request):
             if uploaded_file.name.endswith('.zip'):
                 try: url = getURLfrompackage(uploaded_file)
                 except: form.add_error('file','Uploaded Package is not Viable')
-                try: rating = rate.rate_func(url)
+                try: rating = rate_func(url)
                 except: rating = -1
                 if(rating < 0.5):
                     form.add_error('file','Uploaded Package is not High Enough Quality')
                     return render(request, "failure.html")
                 else:
+                    # The Django package model requires repo name, ID, version, popularity, and overall metric score
+                    # Retrieve repository name, ID, and popularity
+                    [repo_name, repo_ID, stargazers, downs] = getModelContents(url)
+                    # Attempt to retrieve version number
+                    try: repo_ver = getVersionfrompackage(uploaded_file)
+                    except: form.add_error('file', 'Uploaded Package does not contain version in json file')
+                    # Create model
+                    upload_model = Packagey.objects.create(pack_name = str(repo_name), pack_ID = int(repo_ID), version_field = str(repo_ver), stars = int(stargazers), downloads = int(downs),  metrics_score = float("{:.2f}".format(rating)))
+                    # Upload model to Google Cloud Storage
+
+
                     # Upload the file to Google Cloud Storage
                     storage_client = storage.Client()
                     bucket = storage_client.bucket(settings.GS_BUCKET_NAME)
@@ -71,6 +85,12 @@ def download_file(request):
         return HttpResponse("Invalid request method.")
     
 def getURLfrompackage(zipped):
+    with zipfile.ZipFile(zipped) as zip_file:
+        with zip_file.open("package.json") as json_file:
+            json_file_contents = json.load(json_file)
+            return json_file_contents.get('url', None)
+
+def getVersionfrompackage(zipped):
     with zipfile.ZipFile(zipped) as zip_file:
         with zip_file.open("package.json") as json_file:
             json_file_contents = json.load(json_file)
