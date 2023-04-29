@@ -30,16 +30,17 @@ def upload_file(request):
                     form.add_error('file','Uploaded Package is not High Enough Quality')
                     return render(request, "failure.html")
                 else:
-                    # Retrieve information for model
                     # The Django package model requires repo name, ID, version, popularity, and overall metric score
-
                     # Retrieve repository name, ID, and popularity
-                    [repo_name, repo_ID, popularity] = getModelContents(url)
+                    [repo_name, repo_ID, stargazers, downs] = getModelContents(url)
                     # Attempt to retrieve version number
                     try: repo_ver = getVersionfrompackage(uploaded_file)
                     except: form.add_error('file', 'Uploaded Package does not contain version in json file')
-                    # Create model and upload to Google Cloud Storage (rating = overall metric score)
-                    upload_model = Packagey.o
+                    # Create model
+                    upload_model = Packagey.objects.create(pack_name = str(repo_name), pack_ID = int(repo_ID), version_field = str(repo_ver), stars = int(stargazers), downloads = int(downs),  metrics_score = float("{:.2f}".format(rating)))
+                    # Upload model to Google Cloud Storage
+
+
                     # Upload the file to Google Cloud Storage
                     storage_client = storage.Client()
                     bucket = storage_client.bucket(settings.GS_BUCKET_NAME)

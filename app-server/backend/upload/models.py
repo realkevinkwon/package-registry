@@ -8,3 +8,6 @@ class Packagey(models.Model):
     stars = models.IntegerField()  # Stargazer count
     downloads = models.IntegerField() # Download count overall (if releases are relevant)
     metrics_score = models.FloatField(max_length=4) # metric score should at most contain 2 beyond the decimal
+
+    def __str__(self):
+        return self.pack_name
