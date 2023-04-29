@@ -1,8 +1,14 @@
-from upload.metrics import correctness
-from upload.metrics import metric_busfactor
-from upload.metrics import metric_license
-from upload.metrics import responsive
-from upload.metrics import rampup
+# from upload.metrics import correctness
+# from upload.metrics import metric_busfactor
+# from upload.metrics import metric_license
+# from upload.metrics import responsive
+# from upload.metrics import rampup
+
+from metrics import correctness
+from metrics import metric_busfactor
+from metrics import metric_license
+from metrics import responsive
+from metrics import rampup
 
 
 def rate_func(url):
