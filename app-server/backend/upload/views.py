@@ -5,7 +5,8 @@ from google.cloud import storage
 from django.conf import settings
 from .forms import UploadForm
 import re
-from rate import rate_func
+# from upload import rate
+import rate
 import zipfile
 import json
 
@@ -18,9 +19,9 @@ def upload_file(request):
             # Get the uploaded file
             uploaded_file = request.FILES['file']
             if uploaded_file.name.endswith('.zip'):
-                try: url = getURLfrompackage()
+                try: url = getURLfrompackage(uploaded_file)
                 except: form.add_error('file','Uploaded Package is not Viable')
-                try: rating = rate_func(url)
+                try: rating = rate.rate_func(url)
                 except: rating = -1
                 if(rating < 0.5):
                     form.add_error('file','Uploaded Package is not High Enough Quality')
