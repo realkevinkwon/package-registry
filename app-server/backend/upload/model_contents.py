@@ -16,16 +16,18 @@ def getModelContents(link):
     elif "github.com" in link:
         repo_url = link
     else:
-        return ["Incompatible Link",-2]
-    repo = (repo_url.split("github.com/")[
-                    1].split("/"))
+        return ["Incompatible Link",0,-2]
+    repo = (repo_url.split("github.com/")[1].split("/"))
     repo_auth = repo[0]
     repo_name = repo[1].replace(".git", "") # Will be used for the repository name (first entry for model)
     repo_dir = repo_auth + "/" + repo_name
 
     # Go to funcs for individual score and version
-    pop_score = getPopularity(repo_dir)
-    return [repo_name, pop_score]
+    repo_ID = getRepoID(repo_dir)
+    [stars, downs] = getPopularity(repo_dir)
+
+    # Return name, ID and popularity score
+    return [repo_name, repo_ID, stars, downs]
 
 def getRepoID(repo_dir):
     url = "https://api.github.com/repos/" + repo_dir
@@ -33,7 +35,12 @@ def getRepoID(repo_dir):
     except: return 0
     json_contents = get_ID.json()
     repo_ID = 0
-    
+    for IDs in json_contents:
+        if "id" in IDs:
+            repo_ID = json_contents[IDs]
+            break
+    return int(repo_ID)
+
 
 def getPopularity(repo_dir):
     url = "https://api.github.com/repos/"+repo_dir+"/releases"
@@ -53,14 +60,13 @@ def getPopularity(repo_dir):
     if "stargazers_count" in stars_json:
         star_count = stars_json["stargazers_count"]
 
+    # Insanely popular downloads are cut down a bit
     if downloads_count > 900000: downloads_count /= 10
-    return int(star_count + downloads_count)
+    return [int(star_count),int(downloads_count)]
 
-def getVersion(repo_dir):
-    print("MR BEEEAAASSTT")
-
-if __name__ == '__main__':
-    [repo, repo_ID, popscore] = getModelContents("git://github.com/axstin/rbxfpsunlocker.git")
+if __name__ == '__main__': # Impromptu Testing
+    [repo, repo_ID, stars, downs] = getModelContents("git://github.com/axstin/rbxfpsunlocker.git")
     print(repo)
     print(repo_ID)
-    print(popscore)
+    print(stars)
+    print(downs)

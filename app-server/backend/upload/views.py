@@ -28,8 +28,14 @@ def upload_file(request):
                     form.add_error('file','Uploaded Package is not High Enough Quality')
                     return render(request, "failure.html")
                 else:
-                    # Retrieve information for model and upload to Google Cloud Storage
-                    [repo_name, popularity] = getModelContents(url)
+                    # Retrieve information for model
+                    # The Django package model requires repo name, ID, version, popularity, and overall metric score
+
+                    # Retrieve repository name, ID, and popularity
+                    [repo_name, repo_ID, popularity] = getModelContents(url)
+                    # Attempt to retrieve version number
+
+                    # Create model and upload to Google Cloud Storage (rating = overall metric score)
 
                     # Upload the file to Google Cloud Storage
                     storage_client = storage.Client()
@@ -76,6 +82,12 @@ def download_file(request):
     
 def getURLfrompackage(zipped):
     with zipfile.ZipFile(zipped) as zip_file:
-        with zip_file.open("package.json") as json_file:
+        with zip_file.open("../../../../../package.json") as json_file:
             json_file_contents = json.load(json_file)
             return json_file_contents.get('url', None)
+
+def getVersionfrompackage(zipped):
+    with zipfile.ZipFile(zipped) as zip_file:
+        with zip_file.open("../../../../../package.json") as json_file:
+            json_file_contents = json.load(json_file)
+            return json_file_contents.get('version', None)
