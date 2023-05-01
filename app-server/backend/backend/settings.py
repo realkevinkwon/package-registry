@@ -21,7 +21,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-
+#SECRET_KEY = #
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
@@ -37,11 +37,14 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'home',
     'upload',
-    'restart',
-    'yaml_test',
+    'reset',
     'rest_framework',
+    'rest_framework.authtoken',
 ]
+
+AUTHENTICATION_BACKENDS = ['reset.to.DefaultUserBackend']
 
 #rest_framework.permissions.IsAuthenticated: 
 #       Grants access only to authenticated users.
@@ -52,7 +55,7 @@ INSTALLED_APPS = [
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.AllowAny',
+        'rest_framework.permissions.AllowAny'
     ],
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.BasicAuthentication',
@@ -74,7 +77,7 @@ ROOT_URLCONF = 'backend.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'upload', 'templates')],
+        'DIRS': [os.path.join(BASE_DIR, 'upload', 'templates'), os.path.join(BASE_DIR, 'reset', 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -93,12 +96,12 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
-#DATABASES = {
-#    'default': {
-#        'ENGINE': 'django.db.backends.sqlite3',
-#        'NAME': BASE_DIR / 'db.sqlite3',
-#    }
-#}
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
+    }
+}
 
 
 #DATABASES = {
@@ -115,6 +118,9 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 DEFAULT_FILE_STORAGE = 'storages.backends.gcloud.GoogleCloudStorage'
 GS_BUCKET_NAME = 'ingested-packages'
 GS_PROJECT_ID = 'package-registry-team11'
+
+#AUTHENTICATION_BACKENDS = ['path.to.DefaultUserBackend']
+
 
 ## Retrieve this programmatically
 #GS_CREDENTIALS = service_account.Credentials.from_service_account_file('path/to/service_account.json')
@@ -156,6 +162,10 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 
 STATIC_URL = 'static/'
+STATIC_URL = '/static/'
+#STATICFILES_DIRS = [BASE_DIR / "home/static"]
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'home/static/css')]
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field

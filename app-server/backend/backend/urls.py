@@ -20,5 +20,4 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('upload.urls')),
     path('', include('restart.urls')),
-    path('yaml_test', include('yaml_test.urls'))
 ]
