@@ -8,6 +8,7 @@ from .models import Packagey
 from .model_contents import getModelContents
 from .rate import rate_func
 import re
+import io
 # from upload import rate
 # import rate
 import zipfile
@@ -20,32 +21,34 @@ def upload_file(request):
             # Get the uploaded file
             uploaded_file = request.FILES['file']
             if uploaded_file.name.endswith('.zip'):
-                #try: url = getURLfrompackage(uploaded_file)
-                #except: form.add_error('file','Uploaded Package is not Viable')
-                #try: rating = rate_func(url)
-                #except: rating = -1
-                #if(rating < 0.5):
-                #    form.add_error('file','Uploaded Package is not High Enough Quality')
-                #    return render(request, "failure.html")
-                #else:
+                # print("Got Here!")
+                try: url = getURLfrompackage(uploaded_file)
+                except: form.add_error('file','Uploaded Package is not Viable')
+                try: rating = rate_func(url)
+                except: rating = -1
+                print(rating)
+                if(rating < 0.5):
+                   form.add_error('file','Uploaded Package is not High Enough Quality')
+                   return render(request, "failure.html")
+                else:
                     # The Django package model requires repo name, ID, version, popularity, and overall metric score
                     # Retrieve repository name, ID, and popularity
-                #    [repo_name, repo_ID, stargazers, downs] = getModelContents(url)
+                   [repo_name, repo_ID, stargazers, downs] = getModelContents(url)
                     # Attempt to retrieve version number
-                #    try: repo_ver = getVersionfrompackage(uploaded_file)
-                #    except: form.add_error('file', 'Uploaded Package does not contain version in json file')
-                    # Create model
-                    #upload_model = Packagey.objects.create(pack_name = str(repo_name), pack_ID = int(repo_ID), version_field = str(repo_ver), stars = int(stargazers), downloads = int(downs),  metrics_score = float("{:.2f}".format(rating)))
-                    # Upload model to Google Cloud Storage
+                   try: repo_ver = getVersionfrompackage(uploaded_file)
+                   except: form.add_error('file', 'Uploaded Package does not contain version in json file')
+                # Create model
+                # upload_model = Packagey.objects.create(pack_name = str(repo_name), pack_ID = int(repo_ID), version_field = str(repo_ver), stars = int(stargazers), downloads = int(downs),  metrics_score = float("{:.2f}".format(rating)))
+                # Upload model to Google Cloud Storage
 
 
-                    # Upload the file to Google Cloud Storage
-                    storage_client = storage.Client()
-                    bucket = storage_client.bucket(settings.GS_BUCKET_NAME)
-                    blob = bucket.blob('Packages/' + uploaded_file.name)
-                    blob.upload_from_file(uploaded_file)
-                    # Redirect to a success page
-                    return render(request, 'success.html')
+                # Upload the file to Google Cloud Storage
+                storage_client = storage.Client()
+                bucket = storage_client.bucket(settings.GS_BUCKET_NAME)
+                blob = bucket.blob('Packages/' + uploaded_file.name)
+                blob.upload_from_file(uploaded_file)
+                # Redirect to a success page
+                return render(request, 'success.html')
             else:
                 # Display an error message if the file extension is not "zip"
                 form.add_error('file', 'Only ZIP files are allowed.')
@@ -92,13 +95,19 @@ def download_file(request):
         return HttpResponse("Invalid request method.")
     
 def getURLfrompackage(zipped):
-    with zipfile.ZipFile(zipped) as zip_file:
-        with zip_file.open("package.json") as json_file:
-            json_file_contents = json.load(json_file)
-            return json_file_contents.get('url', None)
+    folder_string = zipped.name.rstrip(".zip")
+    with zipfile.ZipFile(zipped.file, 'r') as zip_file:
+        jsonData = zip_file.read(f"{folder_string}/package.json").decode()
+        data = json.load(io.StringIO(jsonData))
+        url = data['repository']['url']
+        url.lstrip("git://")
+        return(url)
+    
 
 def getVersionfrompackage(zipped):
-    with zipfile.ZipFile(zipped) as zip_file:
-        with zip_file.open("package.json") as json_file:
-            json_file_contents = json.load(json_file)
-            return json_file_contents.get('url', None)
+    folder_string = zipped.name.rstrip(".zip")
+    with zipfile.ZipFile(zipped.file, 'r') as zip_file:
+        jsonData = zip_file.read(f"{folder_string}/package.json").decode()
+        data = json.load(io.StringIO(jsonData))
+        version = data['version']
+        return(version)

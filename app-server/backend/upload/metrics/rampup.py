@@ -71,12 +71,12 @@ def getRampUpScore(link):
     else:
         readmeLengthScore = readmeLineCount/100 * 0.8
 
-    print("Section Score: "+str(readmeSectionScore))
-    print("Length Score: "+str(readmeLengthScore) +
-          "  Length: " + str(readmeLineCount))
+    # print("Section Score: "+str(readmeSectionScore))
+    # print("Length Score: "+str(readmeLengthScore) +
+    #       "  Length: " + str(readmeLineCount))
     total_score = round((readmeLengthScore + readmeSectionScore)/2, 2)
 
-    print("Total score: " + str(total_score))
+    print("RampUp Score: " + str(total_score))
 
     os.chdir("..")
 
