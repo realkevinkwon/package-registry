@@ -2,8 +2,8 @@ import subprocess
 import json
 import sys
 import os, shutil
-import valid_url as vu
-import pull_req_graphql
+from .valid_url import *
+from .pull_req_graphql import *
 import git
 import re
 
@@ -38,7 +38,7 @@ def pull_request_fraction(url, owner_repo):
             total_lines = int(cloc_data[item]['code'])
                 
     # Make GraphQL Call for PR Fraction
-    pr_total_lines = pull_req_graphql.pr_fraction_gql(owner_repo, list_of_files, token)
+    pr_total_lines = pr_fraction_gql(owner_repo, list_of_files, token)
 
     # Get total lines of code in Repository
     score = round(float(pr_total_lines)/float(total_lines), 2)
@@ -54,12 +54,12 @@ def pr_score(url):
     # Regex the Package name and get the Github Owner and Repo
     if(url.__contains__("npmjs")):
         package_name = re.search(r"/package/([\w-]+)", url).group(1)
-        owner_repo = str(vu.npm_to_git(package_name))[1:]
+        owner_repo = str(npm_to_git(package_name))[1:]
         url = f"https://github.com/{owner_repo}"
     else:
         owner_repo = url.replace("https://github.com/", "")
 
     # Checks if valid url, and then calls score function
-    if (vu.valid_url(url)):
+    if (valid_url(url)):
         score = pull_request_fraction(url, owner_repo)
     return score

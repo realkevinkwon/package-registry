@@ -8,6 +8,7 @@ from .models import Packagey
 from .model_contents import getModelContents
 from .rate import rate_func
 import re
+import io
 # from upload import rate
 # import rate
 import zipfile
@@ -21,7 +22,12 @@ def upload_file(request):
             uploaded_file = request.FILES['file']
             if uploaded_file.name.endswith('.zip'):
                 try:
-                    package_json = get_package_json(uploaded_file)
+                    print("1")
+                    #package_json = get_package_json(uploaded_file)
+                    package_url = getURLfrompackage(uploaded_file)
+                    #package_name = package_json.get('name', None)
+                    #package_version = package_json.get('version', None)
+                    print(package_url)
                 except:
                     print("Hey")
                 #try: url = getURLfrompackage(uploaded_file)
@@ -41,15 +47,14 @@ def upload_file(request):
                     # Create model
                     #upload_model = Packagey.objects.create(pack_name = str(repo_name), pack_ID = int(repo_ID), version_field = str(repo_ver), stars = int(stargazers), downloads = int(downs),  metrics_score = float("{:.2f}".format(rating)))
                     # Upload model to Google Cloud Storage
-
-
-                    # Upload the file to Google Cloud Storage
-                    storage_client = storage.Client()
-                    bucket = storage_client.bucket(settings.GS_BUCKET_NAME)
-                    blob = bucket.blob('Packages/' + uploaded_file.name)
-                    blob.upload_from_file(uploaded_file)
-                    # Redirect to a success page
-                    return render(request, 'success.html')
+                    
+                # Upload the file to Google Cloud Storage
+                storage_client = storage.Client()
+                bucket = storage_client.bucket(settings.GS_BUCKET_NAME)
+                blob = bucket.blob('Packages/' + uploaded_file.name)
+                blob.upload_from_file(uploaded_file)
+                # Redirect to a success page
+                return render(request, 'success.html')
             else:
                 # Display an error message if the file extension is not "zip"
                 form.add_error('file', 'Only ZIP files are allowed.')
@@ -95,21 +100,34 @@ def download_file(request):
     else:
         return HttpResponse("Invalid request method.")
 
-
 def get_package_json(zipped):
+    print("2")
     with zipfile.ZipFile(zipped) as zip_file:
-        with zip_file.open("package.json") as json_file:
-            json_file_contents = json.load(json_file)
-            return json_file_contents
-  
+        if('package.json' in zip_file.namelist()):
+            print("3")
+            zip_file.extract('package.json')
+            #with zip_file.open("package.json") as json_file:
+            #    print("4")
+            #    json_file_contents = json.load(json_file)
+            #    print("5")
+            #    return json_file_contents
+
+def getURLfrompackage(zipped):
+    folder_string = zipped.name.rstrip(".zip")
+    with zipfile.ZipFile(zipped.file, 'r') as zip_file:
+        jsonData = zip_file.read(f"{folder_string}/package.json").decode()
+        data = json.load(io.StringIO(jsonData))
+        url = data['repository']['url']
+        url = url[6:]
+        url = url.rstrip(".git")
+        # print(url)
+        return(url)
+
 def getURLfrompackage(zipped):
     with zipfile.ZipFile(zipped) as zip_file:
         with zip_file.open("package.json") as json_file:
             json_file_contents = json.load(json_file)
             return json_file_contents.get('url', None)
-
-
-
 
 def getVersionfrompackage(zipped):
     with zipfile.ZipFile(zipped) as zip_file:
