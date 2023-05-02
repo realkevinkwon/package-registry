@@ -25,8 +25,8 @@ def getCorrectnessScore(link):
     repoAPI_link = "https://api.github.com/repos"f"/{owner}/{repo}"
     response = requests.get(repoAPI_link, headers={'Authorization': "token{}".format(GITHUB_TOKEN)})
     result = response.json()
-    for i in result:
-        print(i, result[i])
+    # for i in result:
+    #     print(i, result[i])
     forks_count = result["forks"]
 
     query = """
@@ -77,6 +77,7 @@ def getCorrectnessScore(link):
     # print(percent_with_errors)
     issueScore = max(0,1 - percent_with_errors/10)
     issueScore = round(issueScore, 2)
+    print(issueScore)
     return(issueScore)
     # try:
     #     with open(outfile, "r") as f:

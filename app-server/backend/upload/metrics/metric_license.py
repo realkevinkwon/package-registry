@@ -47,7 +47,7 @@ def import_package_npmjs(url):
         response = requests.get(url)
         data = response.json()
         license_info = data.get("license", "")
-        print(license_info)
+        # print(license_info)
 
         return -1 if license_info == "" else license_info
     except:
