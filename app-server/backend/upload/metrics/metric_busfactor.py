@@ -8,8 +8,8 @@ from .valid_url import *
 import math
 # load_dotenv()
 
-GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
-
+# GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
+GITHUB_TOKEN = "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"
 
 def npm_to_github_api(registry_url):
     # converts registry NPM format to api GitHub format
@@ -111,7 +111,7 @@ def score(url, apiurl):
     # with open(jsonfile, "w") as f:
     #     json.dump(data, f, indent=4)
 
-    print(dependency_score)
+    print("Bus Factor: "+str(dependency_score))
 
     return dependency_score
 
@@ -119,6 +119,8 @@ def bus_factor_score(url):
     if (valid_url(url)):
         apiurl = get_api_url(url)
         return(score(url, apiurl))
+    else:
+        return -1
 
 # if __name__ == "__main__":
 #     # sys args are the url and the json file

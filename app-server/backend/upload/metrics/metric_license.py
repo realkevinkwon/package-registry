@@ -8,7 +8,8 @@ from .valid_url import *
 
 # load_dotenv()
 
-GH_token = os.getenv("GITHUB_TOKEN")
+# GH_token = os.getenv("GITHUB_TOKEN")
+GITHUB_TOKEN = "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"
 
 ### Compatible Licenses ###
 # Sources: https://www.gnu.org/licenses/license-list.en.html and https://spdx.org/licenses/
@@ -87,7 +88,7 @@ def score(url, apiurl):
     license_score = 0
     # scores the URLs for license compatibility
     if "github" in apiurl:
-        package_data = import_package_github(apiurl, GH_token)
+        package_data = import_package_github(apiurl, GITHUB_TOKEN)
         # will run if data is imported correctly
         if package_data != -1:
             license_score = calc_license_github(package_data)
@@ -117,13 +118,15 @@ def score(url, apiurl):
     # with open(jsonfile, "w") as f:
     #     json.dump(data, f, indent=4)
 
-    print(license_score)
+    print("License: " +str(license_score))
     return(license_score)
 
 def license_score(url):
     if (valid_url(url)):
         apiurl = get_api_url(url)
         return(score(url, apiurl))
+    else:
+        return -1
         
 # if __name__ == "__main__":
 #     # sys args are the url and the json file

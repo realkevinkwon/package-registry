@@ -10,7 +10,8 @@ import os
 # Constants for time intervals in seconds
 MONTH_IN_SECONDS = 60 * 60 * 24 * 30
 WEEK_IN_SECONDS = 60 * 60 * 24 * 7
-GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")  # Replace with actual Github token if available
+# GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")  # Replace with actual Github token if available
+GITHUB_TOKEN = "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"
 
 # Function to calculate the responsive score of a Github repository
 def getResponsiveScore(link):
@@ -106,7 +107,7 @@ def getResponsiveScore(link):
     # print("Issue Score: " + str(issueCloseScore) + "  Avg close time(days):" + str(averageCloseTime / 60 / 60 / 24))
     total_score = round(0.5 * commitFrequencyScore + 0.5 *issueCloseScore, 2)
     # print(total_score)
-    print(total_score)
+    print("Responsive: "+str(total_score))
     # try:
     #     with open(outfile, "r") as f:
     #         data = json.load(f)
