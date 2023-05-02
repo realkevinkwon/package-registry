@@ -13,8 +13,6 @@ import re
 import zipfile
 import json
 
-os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = 'credentials-project2.json'
-
 def upload_file(request):
     if request.method == 'POST':
         form = UploadForm(request.POST, request.FILES)
@@ -22,22 +20,22 @@ def upload_file(request):
             # Get the uploaded file
             uploaded_file = request.FILES['file']
             if uploaded_file.name.endswith('.zip'):
-                try: url = getURLfrompackage(uploaded_file)
-                except: form.add_error('file','Uploaded Package is not Viable')
-                try: rating = rate_func(url)
-                except: rating = -1
-                if(rating < 0.5):
-                    form.add_error('file','Uploaded Package is not High Enough Quality')
-                    return render(request, "failure.html")
-                else:
+                #try: url = getURLfrompackage(uploaded_file)
+                #except: form.add_error('file','Uploaded Package is not Viable')
+                #try: rating = rate_func(url)
+                #except: rating = -1
+                #if(rating < 0.5):
+                #    form.add_error('file','Uploaded Package is not High Enough Quality')
+                #    return render(request, "failure.html")
+                #else:
                     # The Django package model requires repo name, ID, version, popularity, and overall metric score
                     # Retrieve repository name, ID, and popularity
-                    [repo_name, repo_ID, stargazers, downs] = getModelContents(url)
+                #    [repo_name, repo_ID, stargazers, downs] = getModelContents(url)
                     # Attempt to retrieve version number
-                    try: repo_ver = getVersionfrompackage(uploaded_file)
-                    except: form.add_error('file', 'Uploaded Package does not contain version in json file')
+                #    try: repo_ver = getVersionfrompackage(uploaded_file)
+                #    except: form.add_error('file', 'Uploaded Package does not contain version in json file')
                     # Create model
-                    upload_model = Packagey.objects.create(pack_name = str(repo_name), pack_ID = int(repo_ID), version_field = str(repo_ver), stars = int(stargazers), downloads = int(downs),  metrics_score = float("{:.2f}".format(rating)))
+                    #upload_model = Packagey.objects.create(pack_name = str(repo_name), pack_ID = int(repo_ID), version_field = str(repo_ver), stars = int(stargazers), downloads = int(downs),  metrics_score = float("{:.2f}".format(rating)))
                     # Upload model to Google Cloud Storage
 
 
@@ -63,10 +61,19 @@ def file_list(request):
     regex_pattern = re.compile(r'^Packages/[^/]+$')
     new_list = list(filter(regex_pattern.match, file_names))
     file_names = sorted(new_list)
-    return render(request, 'list_files.html',  {'file_names': file_names})
+    query = request.GET.get('q')
+    if query:
+        regex_pattern = re.compile(query)
+        file_names = list(filter(regex_pattern.search, file_names))
 
-def file_detail(request, filename):
-    return render(request, 'file_detail.html', {'filename': filename})
+    return render(request, 'list_files.html', {'file_names': file_names})
+
+def hello_world(request):
+    file_name = request.POST.get('file_name')
+    return render(request, 'file_view.html', {'file_name': file_name})
+
+def file_view(request, file_name):
+    return render(request, 'file_view.html', {'file_name': file_name})
 
 def download_file(request):
     project_id = settings.GS_PROJECT_ID 
