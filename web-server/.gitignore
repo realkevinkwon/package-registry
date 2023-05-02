@@ -1,16 +1,15 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
-# front end
 # dependencies
-node_modules/
-.pnp
+/node_modules
+/.pnp
 .pnp.js
 
 # testing
-coverage/
+/coverage
 
 # production
-build/
+/build
 
 # misc
 .DS_Store
@@ -22,21 +21,3 @@ build/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-
-# Python
-*.pyc
-__pycache__
-.pytest_cache/
-venv/
-*.venv
-
-# Rust
-target/
-Cargo.lock
-**/*.rs.bk
-*.pdb
-
-# Misc.
-.vscode/
-
-app-server/backend/credentials-project2.json

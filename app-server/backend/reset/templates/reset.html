@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h1>Reset Package Registry</h1>
+  <p>Are you sure you want to reset?</p>
+  <button id="reset-yes">Yes</button>
+  <button id="reset-no">No</button>
+
+  <script>
+    document.getElementById('reset-yes').onclick = function() {
+      fetch('/reset', {
+        method: 'DELETE', 
+        headers: {
+        'X-Authorization': 'Token ' + '{{ auth_token }}',
+        'Content-Type': 'application/json'
+      }
+      })
+        .then(response => response.json())
+        .then(data => {
+          //if (data.count !== undefined) {
+          {window.location.href = '/reset/success';
+          //} else {
+            console.log(data);
+          }
+        });
+    }
+  </script>
+{% endblock %}
