@@ -13,8 +13,6 @@ import re
 import zipfile
 import json
 
-os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = 'credentials-project2.json'
-
 def upload_file(request):
     if request.method == 'POST':
         form = UploadForm(request.POST, request.FILES)

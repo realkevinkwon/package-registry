@@ -21,7 +21,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-#SECRET_KEY = #
+SECRET_KEY = '3434g'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
@@ -44,7 +44,7 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
 ]
 
-AUTHENTICATION_BACKENDS = ['reset.to.DefaultUserBackend']
+AUTHENTICATION_BACKENDS = ['reset.backend.DefaultUserBackend',]
 
 #rest_framework.permissions.IsAuthenticated: 
 #       Grants access only to authenticated users.
@@ -118,14 +118,11 @@ DATABASES = {
 DEFAULT_FILE_STORAGE = 'storages.backends.gcloud.GoogleCloudStorage'
 GS_BUCKET_NAME = 'ingested-packages'
 GS_PROJECT_ID = 'package-registry-team11'
-
-#AUTHENTICATION_BACKENDS = ['path.to.DefaultUserBackend']
+os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = 'credentials-project2.json'
 
 
 ## Retrieve this programmatically
 #GS_CREDENTIALS = service_account.Credentials.from_service_account_file('path/to/service_account.json')
-
-
 
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
@@ -164,8 +161,6 @@ USE_TZ = True
 STATIC_URL = 'static/'
 STATIC_URL = '/static/'
 #STATICFILES_DIRS = [BASE_DIR / "home/static"]
-STATICFILES_DIRS = [os.path.join(BASE_DIR, 'home/static/css')]
-
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
