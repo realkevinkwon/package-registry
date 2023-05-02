@@ -21,4 +21,6 @@ urlpatterns = [
     path('', include('upload.urls')),
     path('', include('reset.urls')),
     path('', include('home.urls')),
+    path('', include('authenticate.urls')),
+
 ]

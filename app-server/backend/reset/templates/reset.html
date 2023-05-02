@@ -11,7 +11,8 @@
       fetch('/reset', {
         method: 'DELETE', 
         headers: {
-        'X-Authorization': 'Token ' + '{{ auth_token }}'
+        'X-Authorization': 'Token ' + '{{ auth_token }}',
+        'Content-Type': 'application/json'
       }
       })
         .then(response => response.json())

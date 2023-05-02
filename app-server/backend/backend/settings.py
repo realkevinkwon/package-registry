@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'home',
     'upload',
     'reset',
+    'authenticate',
     'rest_framework',
     'rest_framework.authtoken',
 ]
