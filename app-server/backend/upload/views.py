@@ -20,6 +20,10 @@ def upload_file(request):
             # Get the uploaded file
             uploaded_file = request.FILES['file']
             if uploaded_file.name.endswith('.zip'):
+                try:
+                    package_json = get_package_json(uploaded_file)
+                except:
+                    print("Hey")
                 #try: url = getURLfrompackage(uploaded_file)
                 #except: form.add_error('file','Uploaded Package is not Viable')
                 #try: rating = rate_func(url)
@@ -90,12 +94,22 @@ def download_file(request):
         return response
     else:
         return HttpResponse("Invalid request method.")
-    
+
+
+def get_package_json(zipped):
+    with zipfile.ZipFile(zipped) as zip_file:
+        with zip_file.open("package.json") as json_file:
+            json_file_contents = json.load(json_file)
+            return json_file_contents
+  
 def getURLfrompackage(zipped):
     with zipfile.ZipFile(zipped) as zip_file:
         with zip_file.open("package.json") as json_file:
             json_file_contents = json.load(json_file)
             return json_file_contents.get('url', None)
+
+
+
 
 def getVersionfrompackage(zipped):
     with zipfile.ZipFile(zipped) as zip_file:

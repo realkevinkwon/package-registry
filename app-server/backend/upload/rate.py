@@ -9,6 +9,7 @@ from .metrics import metric_busfactor
 from .metrics import metric_license
 from .metrics import responsive
 from .metrics import rampup
+from .metrics import pr_fraction
 
 
 def rate_func(url):
@@ -25,8 +26,11 @@ def rate_func(url):
     except: return -1
     try: ramp = rampup.getRampUpScore(url)
     except: return -1
+    try: pull_request_fraction = pr_fraction.pr_score(url)
+    except: return -1
+    
     scores = [
-        correct, busfactor, licenseScore, responsiveMaintainers, ramp
+        correct, busfactor, licenseScore, responsiveMaintainers, ramp, pull_request_fraction
     ]
 
     return(sum(scores)/len(scores))
