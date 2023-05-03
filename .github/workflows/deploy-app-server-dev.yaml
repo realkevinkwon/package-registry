@@ -1,4 +1,4 @@
-name: 'Build rate-package-service-dev image and deploy to Cloud Run'
+name: 'Build app-server-dev image and deploy to Cloud Run'
 
 on:
   pull_request:
@@ -7,23 +7,22 @@ on:
     branches:
       - 'dev'
     paths:
-      - 'app-server/services/rate-package-service/**'
+      - 'app-server/'
 
 env:
   PROJECT_ID: 'package-registry-team11'
   REGION: 'us-central1'
-  SERVICE: 'rate-package-service-dev'
-  GAR_REPO: 'rate-package-service-dev'
-  SRC_PATH: 'app-server/services/rate-package-service'
+  SERVICE: 'app-server-dev'
+  GAR_REPO: 'app-server-dev'
+  SRC_PATH: 'app-server'
 
 jobs:
   deploy:
     if: github.event.pull_request.merged == true
-    # Add 'id-token' with the intended permissions for workload identity federation
     permissions:
       contents: 'read'
       id-token: 'write'
-
+    
     runs-on: 'ubuntu-latest'
     steps:
       - name: 'Checkout'
