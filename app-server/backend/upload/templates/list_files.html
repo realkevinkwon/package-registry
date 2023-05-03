@@ -11,7 +11,7 @@
     <ul>
         {% for file_name in file_names %}
             <li>{{ file_name }}
-                <form action="{% url 'hello_world' %}" method="post" style="display: inline-block;">
+                <form action="{% url 'file_view' %}" method="post" style="display: inline-block;">
                     {% csrf_token %}
                     <input type="hidden" name="file_name" value="{{ file_name }}">
                     <button type="submit" class="btn btn-primary">View</button>
