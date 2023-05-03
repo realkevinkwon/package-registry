@@ -22,7 +22,7 @@ def upload_file(request):
             uploaded_file = request.FILES['file']
             if uploaded_file.name.endswith('.zip'):
                 # print("Got Here!")
-                try: url = getURLfrompackage(uploaded_file)
+                try: name, url, repo_ver = getDatafrompackage(uploaded_file)
                 except: form.add_error('file','Uploaded Package is not Viable')
                 try: rating = rate_func(url)
                 except: rating = -1
@@ -35,8 +35,8 @@ def upload_file(request):
                     # Retrieve repository name, ID, and popularity
                    [repo_name, repo_ID, stargazers, downs] = getModelContents(url)
                     # Attempt to retrieve version number
-                   try: repo_ver = getVersionfrompackage(uploaded_file)
-                   except: form.add_error('file', 'Uploaded Package does not contain version in json file')
+                #    try: repo_ver = getVersionfrompackage(uploaded_file)
+                #    except: form.add_error('file', 'Uploaded Package does not contain version in json file')
                 # Create model
                 # upload_model = Packagey.objects.create(pack_name = str(repo_name), pack_ID = int(repo_ID), version_field = str(repo_ver), stars = int(stargazers), downloads = int(downs),  metrics_score = float("{:.2f}".format(rating)))
                 # Upload model to Google Cloud Storage
@@ -94,20 +94,24 @@ def download_file(request):
     else:
         return HttpResponse("Invalid request method.")
     
-def getURLfrompackage(zipped):
+def getDatafrompackage(zipped):
     folder_string = zipped.name.rstrip(".zip")
     with zipfile.ZipFile(zipped.file, 'r') as zip_file:
         jsonData = zip_file.read(f"{folder_string}/package.json").decode()
         data = json.load(io.StringIO(jsonData))
         url = data['repository']['url']
-        url.lstrip("git://")
-        return(url)
+        url = url[6:]
+        url = url.rstrip(".git")
+        url = "https://"+url
+        version = data['version']
+        name = data['name']
+        return(name,url,version)
     
 
-def getVersionfrompackage(zipped):
-    folder_string = zipped.name.rstrip(".zip")
-    with zipfile.ZipFile(zipped.file, 'r') as zip_file:
-        jsonData = zip_file.read(f"{folder_string}/package.json").decode()
-        data = json.load(io.StringIO(jsonData))
-        version = data['version']
-        return(version)
+# def getVersionfrompackage(zipped):
+#     folder_string = zipped.name.rstrip(".zip")
+#     with zipfile.ZipFile(zipped.file, 'r') as zip_file:
+#         jsonData = zip_file.read(f"{folder_string}/package.json").decode()
+#         data = json.load(io.StringIO(jsonData))
+#         version = data['version']
+#         return(version)

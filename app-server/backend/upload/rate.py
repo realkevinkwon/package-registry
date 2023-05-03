@@ -15,26 +15,20 @@ def rate_func(url):
     #cleaning URL
     ##TODO##
     #rating URL
-    print("I GOT ALL THE WAY HERE WEEEEEE1")
-    try : correct = correctness.getCorrectnessScore(url)
-    except: return -1
-    print("I GOT ALL THE WAY HERE WEEEEEE2")
+    try : correct = correctness.getCorrectnessScore(url) #working
+    except: correct = -1
     try: busfactor = metric_busfactor.bus_factor_score(url)
-    except: return -1
-    print("I GOT ALL THE WAY HERE WEEEEEE3")
+    except: busfactor = -1
     try: licenseScore = metric_license.license_score(url)
-    except: return -1
-    print("I GOT ALL THE WAY HERE WEEEEEE4")
-    try: responsiveMaintainers = responsive.getResponsiveScore(url)
-    except: return -1
-    print("I GOT ALL THE WAY HERE WEEEEEE5")
+    except: licenseScore = -1
+    try: responsiveMaintainers = responsive.getResponsiveScore(url) #Working
+    except: responsiveMaintainers = -1
     try: ramp = rampup.getRampUpScore(url)
-    except: return -1
+    except: ramp = -1
     scores = [
         correct, busfactor, licenseScore, responsiveMaintainers, ramp
     ]
-
-    print("I GOT ALL THE WAY HERE WEEEEEE")
+    print(scores)
     return(sum(scores)/len(scores))
 
 

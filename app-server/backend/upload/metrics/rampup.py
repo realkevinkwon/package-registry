@@ -27,6 +27,9 @@ def getRampUpScore(link):
 
     repo_dir = (repo_url.split("github.com")[
                 1].split("/"))[2].replace(".git", "")
+    print(repo_url)
+    print(repo_dir)
+
     # Clone the repository
     subprocess.run(["git", "clone", repo_url, repo_dir], check=True)
     # Change the current working directory to the repository
@@ -77,29 +80,12 @@ def getRampUpScore(link):
     total_score = round((readmeLengthScore + readmeSectionScore)/2, 2)
 
     print("RampUp Score: " + str(total_score))
-
     os.chdir("..")
 
     # Delete the repository directory
     full_dir = os.path.join(os.getcwd(), repo_dir)
-    # shutil.rmtree(full_dir)
+
     subprocess.run(["rm", "-rf", full_dir], check=True)
-
-    # try:
-    #     with open("src/inputs/commands/metrics.json", "r") as f:
-    #         data = json.load(f)
-    # except:
-    #     data = {}
-
-    # # Update the score of the "ResponsiveMaintainer" metric
-    # if link in data:
-    #     data[link]["RampUp"] = total_score
-    # else:
-    #     data[link] = {"RampUp": total_score}
-
-    # # Write the updated JSON data back to the file
-    # with open("src/inputs/commands/metrics.json", "w") as f:
-    #     json.dump(data, f, indent=4)
     return(total_score)
 
 if __name__ == "__main__":
