@@ -1,29 +1,28 @@
-name: 'Build download-package-service-staging image and deploy to Cloud Run'
+name: 'Build app-server-prod image and deploy to Cloud Run'
 
 on:
   pull_request:
     types:
       - 'closed'
     branches:
-      - 'staging'
+      - 'prod'
     paths:
-      - 'app-server/services/download-package-service/**'
+      - 'app-server/'
 
 env:
   PROJECT_ID: 'package-registry-team11'
   REGION: 'us-central1'
-  SERVICE: 'download-package-service-staging'
-  GAR_REPO: 'download-package-service-staging'
-  SRC_PATH: 'app-server/services/download-package-service'
+  SERVICE: 'app-server-prod'
+  GAR_REPO: 'app-server-prod'
+  SRC_PATH: 'app-server'
 
 jobs:
   deploy:
     if: github.event.pull_request.merged == true
-    # Add 'id-token' with the intended permissions for workload identity federation
     permissions:
       contents: 'read'
       id-token: 'write'
-
+    
     runs-on: 'ubuntu-latest'
     steps:
       - name: 'Checkout'
@@ -44,12 +43,12 @@ jobs:
 
       - name: 'Docker auth'
         run: |-
-          gcloud auth configure-docker ${{ env.REGION }}-docker.pkg.staging
+          gcloud auth configure-docker ${{ env.REGION }}-docker.pkg.dev
 
       - name: 'Build and push container image'
         run: |-
-          docker build -t "${{ env.REGION }}-docker.pkg.staging/${{ env.PROJECT_ID }}/${{ env.GAR_REPO }}/${{ env.SERVICE }}.image:${{ github.sha }}" "${{ env.SRC_PATH }}"
-          docker push "${{ env.REGION }}-docker.pkg.staging/${{ env.PROJECT_ID }}/${{ env.GAR_REPO }}/${{ env.SERVICE }}.image:${{ github.sha }}"
+          docker build -t "${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.GAR_REPO }}/${{ env.SERVICE }}.image:${{ github.sha }}" "${{ env.SRC_PATH }}"
+          docker push "${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.GAR_REPO }}/${{ env.SERVICE }}.image:${{ github.sha }}"
 
       - name: 'Deploy to Cloud Run'
         id: 'deploy'
@@ -57,4 +56,4 @@ jobs:
         with:
           service: ${{ env.SERVICE }}
           region: ${{ env.REGION }}
-          image: '${{ env.REGION }}-docker.pkg.staging/${{ env.PROJECT_ID }}/${{ env.GAR_REPO }}/${{ env.SERVICE }}.image:${{ github.sha }}'
+          image: '${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.GAR_REPO }}/${{ env.SERVICE }}.image:${{ github.sha }}'
