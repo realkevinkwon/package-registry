@@ -8,6 +8,7 @@
 # import 
 import sys
 import re
+import requests
 
 def valid_url(url):
     # check if the url is valid with regex
@@ -38,7 +39,21 @@ def get_api_url(url):
         return url
     
     return None
-        
+
+def npm_to_git(package_name):
+    url = f"https://registry.npmjs.org/{package_name}"
+    getGit = requests.get(url)
+    if getGit.status_code == 200:
+        if "repository" in getGit.json() or "url" in getGit.json():
+            gitURL = getGit.json()["repository"]["url"]
+            if "github" in gitURL:
+                result = re.search(r"/([\w-]+)/([\w-]+)", gitURL.lower())
+                git_owner = ""
+                if result is not None:
+                    git_owner = result[0]
+                else: git_owner = "Github Regex Fail!"
+                return git_owner
+    return "npm_to_git API Error"           
     
 
 # if __name__ == "__main__":

@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'home',
     'upload',
+    'update_pack',
     'reset',
     'authenticate',
     'rest_framework',

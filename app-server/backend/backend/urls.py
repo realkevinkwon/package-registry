@@ -22,5 +22,5 @@ urlpatterns = [
     path('', include('reset.urls')),
     path('', include('home.urls')),
     path('', include('authenticate.urls')),
-
+    #path('', include('update_pack.urls')),
 ]

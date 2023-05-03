@@ -20,10 +20,23 @@ def upload_file(request):
         if form.is_valid():
             # Get the uploaded file
             uploaded_file = request.FILES['file']
+            #package_zipped = uploaded_file
             if uploaded_file.name.endswith('.zip'):
-                # print("Got Here!")
                 try: name, url, repo_ver = getDatafrompackage(uploaded_file)
                 except: form.add_error('file','Uploaded Package is not Viable')
+                
+                try:
+                    # Upload the file to Google Cloud Storage
+                    storage_client = storage.Client()
+                    bucket = storage_client.bucket(settings.GS_BUCKET_NAME)
+                    blob = bucket.blob('Packages/' + uploaded_file.name)
+                    uploaded_file.seek(0)
+                    blob.upload_from_file(uploaded_file)
+                    # Redirect to a success page
+                    return render(request, 'success.html')
+                except:
+                    print("Cannot Upload to GCP")
+
                 try: rating = rate_func(url)
                 except: rating = -1
                 print(rating)
@@ -31,24 +44,16 @@ def upload_file(request):
                    form.add_error('file','Uploaded Package is not High Enough Quality')
                    return render(request, "failure.html")
                 else:
+                    print("Error Package cannot be Ingested")
                     # The Django package model requires repo name, ID, version, popularity, and overall metric score
                     # Retrieve repository name, ID, and popularity
-                   [repo_name, repo_ID, stargazers, downs] = getModelContents(url)
+                #   [repo_name, repo_ID, stargazers, downs] = getModelContents(url)
                     # Attempt to retrieve version number
                 #    try: repo_ver = getVersionfrompackage(uploaded_file)
                 #    except: form.add_error('file', 'Uploaded Package does not contain version in json file')
                 # Create model
                 # upload_model = Packagey.objects.create(pack_name = str(repo_name), pack_ID = int(repo_ID), version_field = str(repo_ver), stars = int(stargazers), downloads = int(downs),  metrics_score = float("{:.2f}".format(rating)))
                 # Upload model to Google Cloud Storage
-
-
-                # Upload the file to Google Cloud Storage
-                storage_client = storage.Client()
-                bucket = storage_client.bucket(settings.GS_BUCKET_NAME)
-                blob = bucket.blob('Packages/' + uploaded_file.name)
-                blob.upload_from_file(uploaded_file)
-                # Redirect to a success page
-                return render(request, 'success.html')
             else:
                 # Display an error message if the file extension is not "zip"
                 form.add_error('file', 'Only ZIP files are allowed.')
@@ -71,11 +76,8 @@ def file_list(request):
 
     return render(request, 'list_files.html', {'file_names': file_names})
 
-def hello_world(request):
-    file_name = request.POST.get('file_name')
-    return render(request, 'file_view.html', {'file_name': file_name})
-
 def file_view(request, file_name):
+    file_name = request.POST.get('file_name')
     return render(request, 'file_view.html', {'file_name': file_name})
 
 def download_file(request):
@@ -107,11 +109,3 @@ def getDatafrompackage(zipped):
         name = data['name']
         return(name,url,version)
     
-
-# def getVersionfrompackage(zipped):
-#     folder_string = zipped.name.rstrip(".zip")
-#     with zipfile.ZipFile(zipped.file, 'r') as zip_file:
-#         jsonData = zip_file.read(f"{folder_string}/package.json").decode()
-#         data = json.load(io.StringIO(jsonData))
-#         version = data['version']
-#         return(version)
