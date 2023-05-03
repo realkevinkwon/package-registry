@@ -7,4 +7,4 @@ RUN pip3 install -r requirements.txt
 
 COPY . .
 
-CMD ["ptyhon3", "backend/manage.py", "runserver"]
+CMD ["python3", "backend/manage.py", "runserver"]
