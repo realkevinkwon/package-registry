@@ -7,7 +7,7 @@ on:
     branches:
       - 'dev'
     paths:
-      - 'app-server/'
+      - 'app-server/**'
 
 env:
   PROJECT_ID: 'package-registry-team11'
