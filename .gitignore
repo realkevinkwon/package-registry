@@ -40,3 +40,4 @@ Cargo.lock
 .vscode/
 
 app-server/backend/credentials-project2.json
+randomBS.py

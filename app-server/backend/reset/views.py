@@ -9,7 +9,7 @@ from rest_framework.request import Request
 from django.http import HttpResponse
 from .utils import generate_auth_token
 
-@api_view(['GET','DELETE'])
+@api_view(['DELETE'])
 def reset_registry(request: Request):
     # Check for X-Authorization header
     auth_token = request.META.get('HTTP_X_AUTHORIZATION')

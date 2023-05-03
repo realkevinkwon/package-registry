@@ -124,7 +124,7 @@ def getResponsiveScore(link):
     # with open(outfile, "w") as f:
     #     json.dump(data, f, indent=4)
 
-    print(total_score)
+    # print(total_score)
     return(total_score)
 
 # if __name__ == "__main__":
