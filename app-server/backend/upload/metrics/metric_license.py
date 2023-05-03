@@ -8,8 +8,7 @@ from .valid_url import *
 
 # load_dotenv()
 
-# GH_token = os.getenv("GITHUB_TOKEN")
-GITHUB_TOKEN = "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"
+GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
 
 ### Compatible Licenses ###
 # Sources: https://www.gnu.org/licenses/license-list.en.html and https://spdx.org/licenses/

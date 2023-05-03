@@ -8,8 +8,7 @@ from .valid_url import *
 import math
 # load_dotenv()
 
-# GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
-GITHUB_TOKEN = "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"
+GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
 
 def npm_to_github_api(registry_url):
     # converts registry NPM format to api GitHub format

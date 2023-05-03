@@ -7,9 +7,7 @@ import os
 
 # load_dotenv()
 
-# GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
-
-GITHUB_TOKEN = "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"
+GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
 
 def getCorrectnessScore(link):
     if "npmjs.com" in link:
