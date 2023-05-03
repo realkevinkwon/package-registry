@@ -49,7 +49,6 @@ def pull_request_fraction(url, owner_repo):
     return score
 
 def pr_score(url):
-    url = sys.argv[1]
     
     # Regex the Package name and get the Github Owner and Repo
     if(url.__contains__("npmjs")):
