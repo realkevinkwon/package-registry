@@ -77,7 +77,7 @@ def getCorrectnessScore(link):
     # print(percent_with_errors)
     issueScore = max(0,1 - percent_with_errors/10)
     issueScore = round(issueScore, 2)
-    print(issueScore)
+    print("Correctness: " + str(issueScore))
     return(issueScore)
     # try:
     #     with open(outfile, "r") as f:

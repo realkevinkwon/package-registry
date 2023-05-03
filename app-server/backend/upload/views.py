@@ -45,6 +45,7 @@ def upload_file(request):
                 #    return render(request, "failure.html")
                 #else:
                 # print("Got Here!")
+<<<<<<< HEAD
                 #try: url = getURLfrompackage(uploaded_file)
                 #except: form.add_error('file','Uploaded Package is not Viable')
                 #try: rating = rate_func(url)
@@ -54,12 +55,28 @@ def upload_file(request):
                 #   form.add_error('file','Uploaded Package is not High Enough Quality')
                 #   return render(request, "failure.html")
                 #else:
+=======
+                try: name, url, repo_ver = getDatafrompackage(uploaded_file)
+                except: form.add_error('file','Uploaded Package is not Viable')
+                try: rating = rate_func(url)
+                except: rating = -1
+                print(rating)
+                if(rating < 0.5):
+                   form.add_error('file','Uploaded Package is not High Enough Quality')
+                   return render(request, "failure.html")
+                else:
+>>>>>>> d706b602cea6c8a5fc5f1cc1dbcecd5a6a6cda37
                     # The Django package model requires repo name, ID, version, popularity, and overall metric score
                     # Retrieve repository name, ID, and popularity
                 #   [repo_name, repo_ID, stargazers, downs] = getModelContents(url)
                     # Attempt to retrieve version number
+<<<<<<< HEAD
                 #   try: repo_ver = getVersionfrompackage(uploaded_file)
                 #   except: form.add_error('file', 'Uploaded Package does not contain version in json file')
+=======
+                #    try: repo_ver = getVersionfrompackage(uploaded_file)
+                #    except: form.add_error('file', 'Uploaded Package does not contain version in json file')
+>>>>>>> d706b602cea6c8a5fc5f1cc1dbcecd5a6a6cda37
                 # Create model
                 # upload_model = Packagey.objects.create(pack_name = str(repo_name), pack_ID = int(repo_ID), version_field = str(repo_ver), stars = int(stargazers), downloads = int(downs),  metrics_score = float("{:.2f}".format(rating)))
                 # Upload model to Google Cloud Storage
@@ -107,6 +124,7 @@ def download_file(request):
         return response
     else:
         return HttpResponse("Invalid request method.")
+<<<<<<< HEAD
 
 def get_package_json(zipped):
     print("2")
@@ -131,19 +149,27 @@ def getURLfrompackage(zipped):
         return(url)
 
 def getURLfrompackage(zipped):
+=======
+    
+def getDatafrompackage(zipped):
+>>>>>>> d706b602cea6c8a5fc5f1cc1dbcecd5a6a6cda37
     folder_string = zipped.name.rstrip(".zip")
     with zipfile.ZipFile(zipped.file, 'r') as zip_file:
         jsonData = zip_file.read(f"{folder_string}/package.json").decode()
         data = json.load(io.StringIO(jsonData))
         url = data['repository']['url']
-        url.lstrip("git://")
-        return(url)
+        url = url[6:]
+        url = url.rstrip(".git")
+        url = "https://"+url
+        version = data['version']
+        name = data['name']
+        return(name,url,version)
     
 
-def getVersionfrompackage(zipped):
-    folder_string = zipped.name.rstrip(".zip")
-    with zipfile.ZipFile(zipped.file, 'r') as zip_file:
-        jsonData = zip_file.read(f"{folder_string}/package.json").decode()
-        data = json.load(io.StringIO(jsonData))
-        version = data['version']
-        return(version)
+# def getVersionfrompackage(zipped):
+#     folder_string = zipped.name.rstrip(".zip")
+#     with zipfile.ZipFile(zipped.file, 'r') as zip_file:
+#         jsonData = zip_file.read(f"{folder_string}/package.json").decode()
+#         data = json.load(io.StringIO(jsonData))
+#         version = data['version']
+#         return(version)
