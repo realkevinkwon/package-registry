@@ -13,7 +13,10 @@ import io
 # import rate
 import zipfile
 import json
+from rest_framework.response import Response
+from rest_framework.decorators import api_view
 
+#/package
 def upload_file(request):
     if request.method == 'POST':
         form = UploadForm(request.POST, request.FILES)
@@ -108,4 +111,39 @@ def getDatafrompackage(zipped):
         version = data['version']
         name = data['name']
         return(name,url,version)
-    
+
+#/package/{id}
+# @api_view(['GET','PUT','DELETE'])
+# def indv_package(request,slug):
+#     #download package using slug as name
+#     storage_client = storage.Client()
+#     bucket = storage_client.get_bucket(settings.GS_BUCKET_NAME)
+#     blobs = bucket.list_blobs()
+#     if request.method == "GET": #download
+#         if slug not in blobs: return Response({'message': 'Package does not exist.'}, status=404)
+#         else:
+#             return Response({package}, status = 200)
+#     if request.method == "PUT": #update
+#         if slug not in blobs: return Response({'message': 'Package does not exist.'}, status=404)
+#         else:
+#             # package version updated in db
+#             return Response({'message': 'Version is updated'}, status=200)
+#     if request.method == "DELETE":
+#         if slug not in blobs: return Response({'message': 'Package does not exist.'}, status=404)
+#         else:
+#             # remove package from db
+#             return Response({'message': 'Package is deleted'}, status=200)
+
+#/package/{id}/rate
+# @api_view(['GET'])
+# def indv_package_rate(request,slug):
+#     #get rating from db using slug as name
+#     storage_client = storage.Client()
+#     bucket = storage_client.get_bucket(settings.GS_BUCKET_NAME)
+#     blobs = bucket.list_blobs()
+#     if slug not in blobs: return Response({'message': 'Package does not exist'}, status=404)
+#     if -1 in ratings: return Response({'message': 'The package rating system choked on at least one of the metrics.'}, status=500)
+#     else: return Response({}, status=200)
+
+
+#/package/byRegex
